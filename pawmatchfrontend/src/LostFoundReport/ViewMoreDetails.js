@@ -7,10 +7,8 @@ import axios from 'axios';
 const ViewMoreDetails = () => {
   const navigate = useNavigate();
   const role = parseInt(localStorage.getItem('role'), 10);
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
   const [loading, setLoading] = useState(true);
   const { Title, Text } = Typography;
-  const [isModalHistVisible, setIsModalHistVisible] = useState(false);
   const [caseInfo, setCaseInfo] = useState({});
   
   const location = useLocation();
@@ -34,21 +32,6 @@ const ViewMoreDetails = () => {
     getSpecificReportData();
   }, [location.state]);
 
-  const showModal = () => {
-    setIsModalHistVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalHistVisible(false);
-  };
-
-
-
-
-  const handleOk = () => {
-    setIsModalVisible(false); // Close the modal
-    navigate("/ViolationManagement");
-  };
 
   const borderStyle = {
     border: '1px solid #ddd',
@@ -57,18 +40,18 @@ const ViewMoreDetails = () => {
     borderRight: '1px solid #ccc', // Vertical line between columns
   };
   
-  const lastColumnStyle = {
-    ...borderStyle,
-    borderRight: 'none', // Remove the border from the last column
-  };
+  // const lastColumnStyle = {
+  //   ...borderStyle,
+  //   borderRight: 'none', // Remove the border from the last column
+  // };
   
-  const headerStyle = {
-    backgroundColor: '#004b80',
-    color: '#fff',
-    textAlign: 'center',
-    padding: '10px',
-    borderRight: '1px solid #ccc',
-  };
+  // const headerStyle = {
+  //   backgroundColor: '#004b80',
+  //   color: '#fff',
+  //   textAlign: 'center',
+  //   padding: '10px',
+  //   borderRight: '1px solid #ccc',
+  // };
 
 
   if (loading) {

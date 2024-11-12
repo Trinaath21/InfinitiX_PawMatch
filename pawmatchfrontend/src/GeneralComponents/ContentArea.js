@@ -4,6 +4,7 @@ import { Layout, theme } from 'antd';
 import { Routes, Route } from 'react-router-dom';
 import PersonalListing from '../LostFoundReport/PersonalListing';
 import ViewMoreDetails from '../LostFoundReport/ViewMoreDetails'; // Import the ViewMoreDetails component
+import PublicLostPetListings from '../LostFoundReport/PublicLostPetListings';
 const { Content } = Layout;
 
 const ContentArea = () => {
@@ -22,10 +23,10 @@ const ContentArea = () => {
       }}
     >
       <Routes>
-        <Route path="/" element={<PersonalListing />} /> 
+        <Route path="/" element={<PublicLostPetListings />} /> 
+        <Route path="/publicLostReportList" element={<PublicLostPetListings />} /> 
         <Route path="/personalReportlisting" element={<PersonalListing />} /> 
         <Route path="/viewMoreDetails" element={<ViewMoreDetails />} /> 
-        {/* Add additional routes as needed */}
       </Routes>
     </Content>
   );

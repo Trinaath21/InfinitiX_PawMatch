@@ -174,10 +174,10 @@ const AddNewReport = ({ visible, onClose,refreshTableData }) => {
                 .max(1, 'Only one image is allowed')
                 .test(
                     'fileType',
-                    'Only JPG, or GIF formats are allowed',
+                    'Only JPG, PNG, or GIF formats are allowed',
                     (images) => {
                         if (!images || images.length === 0) return false;
-                        const acceptedFormats = ['image/jpg','image/jpeg', 'image/gif'];
+                        const acceptedFormats = ['image/jpg','image/png','image/jpeg', 'image/gif'];
                         return acceptedFormats.includes(images[0].type);
                     }
                 ),
@@ -427,7 +427,7 @@ const AddNewReport = ({ visible, onClose,refreshTableData }) => {
                 onChange={handleChange}
                 maxCount={1}
                 beforeUpload={(file) => {
-                    const isJpgOrGif = file.type === 'image/jpeg' || file.type === 'image/gif';
+                    const isJpgOrGif = file.type === 'image/jpeg' || file.type === 'image/gif'|| file.type === 'image/png';
                     if (!isJpgOrGif) {
                         message.error('You can only upload JPG or GIF files!');
                     }

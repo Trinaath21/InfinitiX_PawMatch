@@ -1,5 +1,6 @@
 import React from 'react';
 import { Layout, Menu, Button } from 'antd';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import pawMatchLogo from '../images/PawMatchLogo.png';
 import {
   DesktopOutlined,
@@ -15,35 +16,36 @@ import {
 
 const { Sider } = Layout;
 
-function getItem(label, key, icon, children) {
+function getItem(label, key, icon, onClick, children) {
   return {
     key,
     icon,
+    onClick, // Add onClick function
     children,
     label,
   };
 }
 
-// Define the Sidebar Component
 const Sidebar = ({ collapsed, toggleCollapse, userRole }) => {
-  // Define dropdown items with conditional check for userRole
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const items = [
-    getItem('Home', '1', <HomeOutlined />),
-    userRole !== 2 && getItem('Lost & Found', 'sub1', <PieChartOutlined />, [
-      getItem('Public Listing', '2-1'),
-      getItem('Personal Listing', '2-2')
+    getItem('Home', '1', <HomeOutlined />, () => navigate('/')),
+    userRole !== 2 && getItem('Lost & Found', 'sub1', <PieChartOutlined />, null, [
+      getItem('Public Listing', '2-1', null, () => navigate('/publicLostReportList')),
+      getItem('Personal Listing', '2-2', null, () => navigate('/personalReportlisting')),
     ]),
-    getItem('Adoption', 'sub2', <HeartOutlined />, [
-      getItem('Public Listing', '3-1'),
-      getItem('Personal Listing', '3-2')
+    getItem('Adoption', 'sub2', <HeartOutlined />, null, [
+      getItem('Public Listing', '3-1', null, () => navigate('/adoption/public')),
+      getItem('Personal Listing', '3-2', null, () => navigate('/adoption/personal'))
     ]),
-    getItem('Stray', 'sub3', <YuqueFilled />, [
-      getItem('Public Listing', '4-1'),
-      getItem('Personal Listing', '4-2')
+    getItem('Stray', 'sub3', <YuqueFilled />, null, [
+      getItem('Public Listing', '4-1', null, () => navigate('/stray/public')),
+      getItem('Personal Listing', '4-2', null, () => navigate('/stray/personal'))
     ]),
-    getItem('Donation', '5', <DesktopOutlined />),
-    getItem('Settings', '6', <SettingOutlined />),
-    getItem('Logout', '7', <LogoutOutlined />),
+    getItem('Donation', '5', <DesktopOutlined />, () => navigate('/donation')),
+    getItem('Settings', '6', <SettingOutlined />, () => navigate('/settings')),
+    getItem('Logout', '7', <LogoutOutlined />, () => navigate('/logout')),
     {
       key: 'collapse-button',
       label: (
@@ -53,16 +55,15 @@ const Sidebar = ({ collapsed, toggleCollapse, userRole }) => {
           onClick={toggleCollapse}
           style={{
             fontSize: '16px',
-            width: '100%', // Make the button full width
-            height: 64, // Set height for the button
-            margin: 0, // Remove any default margin
+            width: '100%',
+            height: 64,
+            margin: 0,
           }}
         />
       ),
-      // Disable dropdown for the button item
       children: null,
     },
-  ].filter(Boolean); // Filter out undefined items
+  ].filter(Boolean);
 
   return (
     <Sider
@@ -84,14 +85,13 @@ const Sidebar = ({ collapsed, toggleCollapse, userRole }) => {
           src={pawMatchLogo}
           alt="PawMatch Logo"
           style={{
-            width: collapsed ? '40px' : '100px', // Adjust width based on collapsed state
+            width: collapsed ? '40px' : '100px',
             height: 'auto',
             transition: 'width 0.3s',
           }}
         />
       </div>
 
-      {/* Menu Items with Dropdowns */}
       <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} items={items} />
     </Sider>
   );

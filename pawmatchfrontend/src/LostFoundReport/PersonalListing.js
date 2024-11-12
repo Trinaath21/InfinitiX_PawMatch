@@ -18,7 +18,7 @@ const PersonalListing = () => {
     const refreshTableData = async () => {
         setLoading(true); 
         try {
-            const response = await axios.post('http://localhost:8000/api/getAllReports', {
+            const response = await axios.post('http://localhost:8000/api/getAllReportsByUserID', {
                 userID: 1 //later must use localStorage.
             });
             setData(response.data.data); 
