@@ -11,7 +11,6 @@ class LostFoundController extends Controller
 
         public function store(Request $request)
         {
-            // Validate the request
             $validator = Validator::make($request->all(), [
                 'user_id' => 'required|integer', 
                 'name' => 'required|string',
@@ -25,7 +24,7 @@ class LostFoundController extends Controller
                 'size' => 'required|integer|min:0',
                 'contactEmail' => 'required|email',
                 'contactPhone' => 'required|string',
-                'image' => 'required|image|mimes:jpeg,png,gif|max:2048', // Max 2MB
+                'image' => 'required|image|mimes:jpeg,png,gif|max:1000000', // Max 2MB
             ]);
         
             if ($validator->fails()) {
@@ -84,7 +83,7 @@ class LostFoundController extends Controller
             return response()->json(['success' => true, 'message' => 'Report deleted successfully']);
         }
 
-        public function getAllReports(Request $request)
+        public function getAllReportsByUserID(Request $request)
         {
             try {
                 $reports = DB::table('reportlostfound')
@@ -243,6 +242,37 @@ class LostFoundController extends Controller
             } catch (\Exception $e) {
                 // Handle any errors
                 return response()->json(['success' => false, 'message' => 'Error retrieving report data'], 500);
+            }
+        }
+        public function getAllReports(Request $request)
+        {
+            try {
+                $excludedUserId = $request->input('userID'); // Assuming 'user_id' is sent in the request
+
+                $reports = DB::table('reportlostfound')
+                    ->join('member', 'reportlostfound.user_id', '=', 'member.user_id')
+                    ->where('reportlostfound.status', 'active')
+                    ->where('reportlostfound.user_id', '!=', $excludedUserId)
+                    ->select('reportlostfound.*', 'member.*') // Fetches all fields from both tables
+                    ->get();
+                
+                
+            
+        
+                $reports = $reports->map(function ($report) {
+                    if ($report->image !== null) {
+                        $report->image = base64_encode($report->image);
+                    } else {
+                        $report->image = null;
+                    }
+                    return $report;
+                });
+        
+                // Return the reports as a JSON response
+                return response()->json(['success' => true, 'data' => $reports], 200);
+            } catch (\Exception $e) {
+                // Handle any errors and return a 500 response
+                return response()->json(['success' => false, 'message' => 'Error retrieving reports'], 500);
             }
         }
         
