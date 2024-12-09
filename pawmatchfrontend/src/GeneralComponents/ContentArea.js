@@ -5,6 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 import PersonalListing from '../LostFoundReport/PersonalListing';
 import ViewMoreDetails from '../LostFoundReport/ViewMoreDetails'; // Import the ViewMoreDetails component
 import PublicLostPetListings from '../LostFoundReport/PublicLostPetListings';
+import ViewReplyReport from '../LostFoundReport/ViewReplyReport';
 const { Content } = Layout;
 
 const ContentArea = () => {
@@ -27,6 +28,9 @@ const ContentArea = () => {
         <Route path="/publicLostReportList" element={<PublicLostPetListings />} /> 
         <Route path="/personalReportlisting" element={<PersonalListing />} /> 
         <Route path="/viewMoreDetails" element={<ViewMoreDetails />} /> 
+        <Route path="/viewMoreDetails/:id" element={<ViewMoreDetails />} />
+        <Route path="/viewReplyReport" element={<ViewReplyReport />} />
+
       </Routes>
     </Content>
   );

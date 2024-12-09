@@ -130,7 +130,7 @@ const PersonalListing = () => {
 
     const handleViewMore = (reportID) => {
         console.log("Viewing details for report ID:", reportID);
-        navigate('/viewMoreDetails', { state: { reportID: reportID } });
+        navigate('/viewMoreDetails', { state: { reportID: reportID, page:"/personalReportlisting" } });
     };
     const handleEdit = (reportID) => {
         const reportData = data.find((report) => report.report_id === reportID);
@@ -154,7 +154,7 @@ const PersonalListing = () => {
                     onClick={handleAddNewReport} 
                     style={{ marginBottom: '20px' }}
                 >
-                    Add New Report
+                    Add Report
                 </Button>
             </Col>
             <Col span={24}>

@@ -76,7 +76,9 @@ const PublicLostPetListings = () => {
     setPage(page);
   };
   const handleCardClick = (reportID) => {
-    navigate('/viewMoreDetails', { state: { reportID } }); // Pass the report_id in the state
+    navigate('/viewMoreDetails', {
+      state: { reportID: reportID, page: "/publicLostReportList" },
+    });
   };
 
   return (

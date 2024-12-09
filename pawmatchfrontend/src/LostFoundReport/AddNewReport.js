@@ -212,6 +212,10 @@ const AddNewReport = ({ visible, onClose,refreshTableData }) => {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+                console.log(response.data.lostPetId);
+                await axios.post('http://localhost:8000/api/notify-users', {
+                    reportID: response.data.lostPetId,
+                });
                 message.success('Lost pet report submitted successfully!');
                 formik.resetForm(); 
                 onClose(false);
