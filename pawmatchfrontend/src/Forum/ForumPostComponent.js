@@ -21,7 +21,7 @@ import { MessageOutlined, FileOutlined, PlusOutlined, EditOutlined, DeleteOutlin
 import { Editor } from '@tinymce/tinymce-react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import MyPostsComponent from './MyPostsComponent';
+
 
 
 //const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
