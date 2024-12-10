@@ -13,18 +13,21 @@ import {
   notification,
   theme,
   Upload,
+  Spin,
   FloatButton,
+  ExclamationCircleOutlined
 } from 'antd';
 import { MessageOutlined, FileOutlined, PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Editor } from '@tinymce/tinymce-react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-
+import MyPostsComponent from './MyPostsComponent';
 
 
 //const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
 const { Content } = Layout;
+const { confirm } = Modal;
 
 const ContentComponent = () => {
   const {
@@ -40,15 +43,33 @@ const ContentComponent = () => {
   const [fileList, setFileList] = useState([]);
   const [data, setData] = useState([]);
   const [userPosts, setUserPosts] = useState([]);
-  //const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState({});
+  const [allPosts, setAllPosts] = useState([]);
+  const [myPosts, setMyPosts] = useState([]);
+  const [currentCategory, setCurrentCategory] = useState('general');
+  const [isMyPostListVisible, setIsMyPostListVisible] = useState(false);
 
-  // Fetch all posts on component mount
+
+
+// Fetch all posts on component mount
+useEffect(() => {
+  fetchAllPosts(); // Load all posts on mount
+}, []);
+
+  // Fetch post basd on category general or my posts
   useEffect(() => {
-    fetchAllPosts();
-  }, []);
+
+  if (currentCategory === 'general') {
+    setData(allPosts); // Show all posts
+  } else if (currentCategory === 'myPosts') {
+    setData(myPosts); // Show user-specific posts
+  }
+}, [currentCategory, allPosts, myPosts]);
 
   // Fetch all posts from the API
   const fetchAllPosts = async () => {
+    setLoading(true);
     try {
       const response = await axios.get('http://localhost:8000/posts');
       const postsData = response.data.map(post => ({
@@ -56,16 +77,146 @@ const ContentComponent = () => {
         images: Array.isArray(post.images) ? post.images : JSON.parse(post.images || "[]")
     }));
       setData(response.data);
+      setAllPosts(postsData);
+      setIsMyPostListVisible(false); // Hide "My Posts" section
     } catch (error) {
       console.error("Error fetching posts:", error);
       notification.error({ message: 'Failed to fetch posts.' });
+    } finally {
+      setLoading(false);
     }
   };
+
+  const fetchMyPosts = async () => {
+    setLoading(true);
+    try {
+      const userId = 1;
+      const response = await axios.get('http://localhost:8000/user/posts/1'); // Replace with your actual API endpoint
+      const postsData = response.data.map(post => ({
+        ...post,
+        images: Array.isArray(post.images) ? post.images : JSON.parse(post.images || "[]")
+    }));
+    console.log('Formatted Posts:', postsData);
+
+       // Filter posts by user ID
+   // const userPosts = postsData.filter(post => post.user_id === userId);
+    setData(response.data);
+    setMyPosts(postsData);
+    setIsMyPostListVisible(true);
+    } catch (error) {
+      console.error('Error fetching user posts:', error);
+     // return [];
+    } finally {
+      setLoading(false);
+    }
+};
+
+  
+
+  const MAX_LENGTH = 100; // Maximum length for truncated content
+  const showDeleteConfirm = (postId) => {
+    confirm({
+      title: "Are you sure you want to delete this post?",
+      content: "Once deleted, this action cannot be undone.",
+      okText: "Confirm",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk() {
+        handleDelete(postId).then(() => {
+          window.location.reload(); // Refresh the page
+        
+      });
+    },
+      onCancel() {
+        console.log("Deletion canceled.");
+      },
+    });
+  };
+const UserPostModal = ({
+  isEditListVisible,
+  handleCancel,
+  userPosts,
+  showEditModal,
+  handleDelete,
+}) => {
+  const [expandedPosts, setExpandedPosts] = useState({}); // Track which posts are expanded
+
+  const toggleExpand = (postId) => {
+    setExpandedPosts((prevState) => ({
+      ...prevState,
+      [postId]: !prevState[postId], // Toggle expanded state
+    }));
+  };
+
+  return (
+    <Modal
+      title="Select a Post to Edit"
+      open={isEditListVisible}
+      onCancel={handleCancel}
+      footer={null}
+    >
+      <List
+        itemLayout="horizontal"
+        dataSource={userPosts}
+        renderItem={(item) => {
+          const isExpanded = expandedPosts[item.post_id] || false;
+          const contentToShow = isExpanded
+            ? item.content
+            : item.content.length > MAX_LENGTH
+            ? `${item.content.slice(0, MAX_LENGTH)}...`
+            : item.content;
+
+          return (
+            <List.Item
+              key={item.post_id}
+              actions={[
+                <Button
+                  icon={<EditOutlined />}
+                  onClick={() => showEditModal(item.post_id)}
+                  style={{ marginRight: '1px' }}
+                >
+                  Edit
+                </Button>,
+                <Button
+                  icon={<DeleteOutlined />}
+                  danger
+                 // onClick={() => handleDelete(item.post_id)}
+                 onClick={() => showDeleteConfirm(item.post_id)}
+                >
+                  Delete
+                </Button>,
+              ]}
+            >
+              <List.Item.Meta
+                title={item.title}
+                description={
+                  <>
+                    <span>{contentToShow}</span>
+                    {item.content.length > MAX_LENGTH && (
+                      <Button
+                        type="link"
+                        onClick={() => toggleExpand(item.post_id)}
+                        style={{ paddingLeft: '5px' }}
+                      >
+                        {isExpanded ? 'Show Less' : 'Show More'}
+                      </Button>
+                    )}
+                  </>
+                }
+              />
+            </List.Item>
+          );
+        }}
+      />
+    </Modal>
+  );
+};
+
 
   // Fetch user's posts from the API
   const fetchUserPosts = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/user/posts/1'); // Temporary user_id: 1
+      const response = await axios.get("http://localhost:8000/user/posts/1"); // Temporary user_id: 1
       setUserPosts(response.data);
       setIsEditListVisible(true);
     } catch (error) {
@@ -100,16 +251,6 @@ const ContentComponent = () => {
       form.setFieldsValue({ title: postData.title });
       setEditorContent(postData.content);  
 
-       
-    /*    // Ensure imagesArray is an array
-        if (!Array.isArray(imagesArray)) {
-            imagesArray = JSON.parse(imagesArray) || [];
-        }
-*/
-     //   setFileList(imagesArray.map(image => image.url)); // or however you are handling image URLs
-     //const imagesArray = Array.isArray(postData.images) ? postData.images : JSON.parse(postData.images); 
-     //const imagesArray = Array.isArray(postData.images) ? postData.images : (postData.images);                                                  
-  
       // Map over the images to create the file list, dynamically setting the file name
      setFileList(
         imagesArray.map((image, index) => ({
@@ -181,10 +322,7 @@ const handleSubmit = async () => {
         const url = isEditing ? `http://localhost:8000/posts/${currentPostId}` : 'http://localhost:8000/posts';
         const method = isEditing ? 'post' : 'post';
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-       /* await axios[method](url, formData, {
-            headers: { 'X-CSRF-TOKEN': csrfToken, // Include CSRF token
-                        'Content-Type': 'multipart/form-data' },
-        }); */
+      
 
         await axios({
             method,
@@ -240,6 +378,25 @@ const handleSubmit = async () => {
     setIsEditListVisible(false);
   };
 
+  // Utility function to strip HTML tags
+  const stripHTMLTags = (text) => text.replace(/<[^>]*>/g, '');
+
+  // Utility function to truncate text
+  const truncateText = (text, maxLength) => {
+    if (!text || text.length <= maxLength) {
+      return {truncated: false, content: text };
+    }
+    return { truncated: true, content: text.substring(0, maxLength) + "..." };
+  };
+
+  // Toggle description view
+  const toggleExpanded = (postId) => {
+    setExpanded((prevState) => ({
+      ...prevState,
+      [postId]: !prevState[postId],
+    }));
+  };
+
   return (
     <Content style={{ margin: '0 16px', position: 'relative' }}>
         <Breadcrumb
@@ -249,47 +406,156 @@ const handleSubmit = async () => {
     { title: 'Forum' },
   ]}
 />
-       {/*<Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>PawMatch</Breadcrumb.Item>
-        <Breadcrumb.Item>Forum</Breadcrumb.Item>
-      </Breadcrumb>  */}
 
+      {/* Category Buttons */}
+      <div style={{ marginBottom: 16, textAlign: 'center' }}>
+        <Button
+          type={currentCategory === 'general' ? 'primary' : 'default'}
+          
+          onClick={() => {
+            setCurrentCategory('general'); // Update category
+            fetchAllPosts();               // Fetch all posts
+            setData(allPosts); // Show all posts
+          }}
+          style={{ marginRight: 8 }}
+        >
+          General Posts
+        </Button>
+        <Button
+          type={currentCategory === 'myPosts' ? 'primary' : 'default'}
+          
+          onClick={async() => {
+            setCurrentCategory('myPosts'); // Update category
+            await fetchMyPosts(); // Fetch user-specific posts
+            setData(myPosts); // Show user-specific posts
+            setIsMyPostListVisible(true)
+           
+          }}
+        >
+          My Posts
+        </Button>
+      </div>
+
+      {/* Post List */}
       <div style={{ padding: 24, minHeight: 360, background: colorBgContainer, borderRadius: borderRadiusLG }}>
+      {loading ? (
+          <Spin />
+        ) : isMyPostListVisible ? (
+          <List
+            itemLayout="vertical"
+            size="large"
+            pagination={{ pageSize: 3 }}
+            dataSource={myPosts}
+            renderItem={(item) => {
+              const truncatedText = truncateText(stripHTMLTags(item.content), 100);
+              return (
+                <List.Item
+                  key={item.title}
+                  actions={[
+                    <Link to={`/post/${item.post_id}`} key="list-vertical-message">
+                      <IconText icon={MessageOutlined} text={item.comments_count} />
+                    </Link>,
+                  ]}
+                  extra={
+                    Array.isArray(item.images) && item.images.length > 0 ? (
+                      <Link to={`/post/${item.post_id}`}>
+                        <img width={272} alt={"Post Image"} src={`http://localhost:8000${item.images[0]}`} />
+                      </Link>
+                    ) : (
+                      <Link to={`/post/${item.post_id}`}>
+                        <img
+                          width={272}
+                          alt="Default Image"
+                          src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png"
+                        />
+                      </Link>
+                    )
+                  }
+                >
+                  <List.Item.Meta
+                    title={<Link to={`/post/${item.post_id}`}>{item.title}</Link>}
+                    description={`Created: ${new Date(item.created_at).toLocaleDateString()} | Updated: ${new Date(item.updated_at).toLocaleDateString()}`}
+                  />
+                  <div>
+                    {expanded[item.post_id] ? stripHTMLTags(item.content) : truncatedText.content}
+                    {truncatedText.truncated && (
+                      <span
+                        style={{
+                          color: '#1890ff',
+                          cursor: 'pointer',
+                          marginLeft: '8px',
+                        }}
+                        onClick={() => toggleExpanded(item.post_id)}
+                      >
+                        {expanded[item.post_id] ? 'Show Less' : 'Show More'}
+                      </span>
+                    )}
+                  </div>
+                </List.Item>
+              );
+            }}
+          />
+        ) :(
         <List
           itemLayout="vertical"
           size="large"
           pagination={{ pageSize: 3 }}
           dataSource={data}
-          renderItem={(item) => (
+          renderItem={(item) => {
+            const truncatedText = truncateText(stripHTMLTags(item.content), 100);
+            return (
             <List.Item
+            
               key={item.title}
-              actions={[<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />]}
-              //extra={<img width={272} alt="Post Image" src={item.images && item.images[0] ? item.images[0] : 'default-image-url'} />}
+              actions={[
+                <Link to={`/post/${item.post_id}`} key="list-vertical-message" >
+              <IconText icon={MessageOutlined} text={item.comments_count} />
+              </Link>
+              ]}
+
               extra={
+                
                 Array.isArray(item.images) && item.images.length > 0 ? (
-                    item.images.map((image, index) => (
-                        <img key={index} width={272} alt={`Post Image ${index}`} src={`http://localhost:8000${image}`} />
-                    ))
+                   
+                        <Link to={`/post/${item.post_id}`}>
+                        <img width={272} alt={"Post Image"} src={`http://localhost:8000${item.images[0]}`} />
+                        </Link>
+                    //))
                 ) : (
+                    <Link to={`/post/${item.post_id}`}>
                     <img width={272} alt="Default Image" src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png" />
+                    </Link>
                 )
             }
 
             >
               <List.Item.Meta
-                //avatar={<Avatar src={item.avatar} />}
-                //title={<a href={item.href}>{item.title}</a>}
-                //description={item.description}
-                //title={item.title}
+              
                 title={
                     <Link to={`/post/${item.post_id}`}>{item.title}</Link>
                   }
                 description={`Created: ${new Date(item.created_at).toLocaleDateString()} | Updated: ${new Date(item.updated_at).toLocaleDateString()}`}
               />
-              {item.content}
+              <div>
+                  {expanded[item.post_id] ? stripHTMLTags(item.content) : truncatedText.content}
+                  {truncatedText.truncated && (
+                  <span
+                    style={{
+                      color: '#1890ff',
+                      cursor: 'pointer',
+                      marginLeft: '8px',
+                    }}
+                    onClick={() => toggleExpanded(item.post_id)}
+                  >
+                    {expanded[item.post_id] ? 'Show Less' : 'Show More'}
+                  </span>
+                  )}
+                </div>
             </List.Item>
           )}
+        }
         />
+      )}
       </div>
 
       {/* Floating Button Group */}
@@ -303,37 +569,16 @@ const handleSubmit = async () => {
         <FloatButton icon={<EditOutlined />} onClick={fetchUserPosts} />
       </FloatButton.Group>
 
+      
       {/* Modal for listing user's posts */}
-      <Modal
-        title="Select a Post to Edit"
-        open={isEditListVisible}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <List
-          itemLayout="horizontal"
-          dataSource={userPosts}
-          renderItem={(item) => (
-            <List.Item
-              key={item.post_id}
-              actions={[
-                <>
-                <Button icon={<EditOutlined />} onClick={() => showEditModal(item.post_id)}
-                style={{ marginRight: '8px' }}>Edit</Button>
+      <UserPostModal
+  isEditListVisible={isEditListVisible}
+  handleCancel={handleCancel}
+  userPosts={userPosts}
+  showEditModal={showEditModal}
+  handleDelete={handleDelete}
+/>
 
-                <Button icon={<DeleteOutlined/>} onClick={() => handleDelete(item.post_id)}>Delete</Button>
-                </>
-              ]}
-            >
-              <List.Item.Meta
-                avatar={<Avatar src={item.avatar} />}
-                title={item.title}
-                description={item.content}
-              />
-            </List.Item>
-          )}
-        />
-      </Modal>
 
       {/* Modal for Create or Edit Forum Post */}
       <Modal
@@ -363,14 +608,15 @@ const handleSubmit = async () => {
                 height: 300,
                 menubar: true,
                 plugins: [
-                  'advlist autolink link image lists charmap preview anchor pagebreak',
-                  'searchreplace wordcount visualblocks code fullscreen',
-                  'insertdatetime media table emoticons help'
+                  "advlist", "autolink", "link", "image", "lists", "charmap", "preview","anchor", "pagebreak",
+                  "searchreplace","wordcount","visualblocks", "code", "fullscreen",
+                  "insertdatetime","media", "table", "emoticons", "help",
                 ],
                 toolbar:
                   'undo redo | formatselect | bold italic backcolor | ' +
                   'alignleft aligncenter alignright alignjustify | ' +
                   'bullist numlist outdent indent | removeformat | help',
+                  
               }}
               onEditorChange={handleEditorChange}
             />
@@ -400,579 +646,5 @@ export default ContentComponent;
 
 
 
-/*import React, { useEffect, useState } from 'react';
-import {
-  Breadcrumb,
-  Layout,
-  List,
-  Avatar,
-  Space,
-  FloatButton,
-  Modal,
-  Form,
-  Input,
-  Button,
-  notification,
-  theme,
-  Upload
-} from 'antd';
-import { MessageOutlined, FileOutlined, PlusOutlined, EditOutlined, UpCircleOutlined } from '@ant-design/icons';
-import { Editor } from '@tinymce/tinymce-react';
-import axios from 'axios';
 
-const { Content } = Layout;
-
-const ContentComponent = () => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-
-  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-  const [isEditSelectModalVisible, setIsEditSelectModalVisible] = useState(false);
-  const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-  const [form] = Form.useForm();
-  const [editorContent, setEditorContent] = useState("");
-  const [fileList, setFileList] = useState([]);
-  const [userPosts, setUserPosts] = useState([]);
-  const [selectedPost, setSelectedPost] = useState(null);
-
-  // Open Modal for Creating Post
-  const showCreateModal = () => {
-    setIsCreateModalVisible(true);
-  };
-
-  // Open Modal to Select Post for Editing
-  const showEditSelectModal = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/posts/user/1'); // Adjust URL as needed
-      setUserPosts(response.data);
-      setIsEditSelectModalVisible(true);
-    } catch (error) {
-      console.error("Failed to fetch posts:", error);
-      notification.error({
-        message: 'Error',
-        description: 'Failed to load user posts. Please try again.',
-      });
-    }
-  };
-
-  // Handle form submission
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("content", editorContent);
-
-      // Append images to formData
-      fileList.forEach((file) => {
-        formData.append("images[]", file.originFileObj);
-      });
-
-      await axios.post('http://localhost:8000/posts', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      notification.success({
-        message: 'Success',
-        description: 'Post created successfully!',
-      });
-
-      form.resetFields();
-      setEditorContent("");
-      setFileList([]);
-      setIsCreateModalVisible(false);
-    } catch (error) {
-      console.error("Error creating post:", error);
-      notification.error({
-        message: 'Error',
-        description: 'Failed to create the post. Please try again.',
-      });
-    }
-  };
-
-  // Handle editor content change
-  const handleEditorChange = (content) => {
-    setEditorContent(content);
-  };
-
-  // Handle image selection and file list management
-  const handleImageUpload = ({ fileList }) => {
-    setFileList(fileList);
-    return false;
-  };
-
-  // Close Create Modal
-  const handleCancel = () => {
-    form.resetFields();
-    setEditorContent("");
-    setFileList([]);
-    setIsCreateModalVisible(false);
-    setIsEditModalVisible(false);
-  };
-
-  // Select post to edit
-  const handleEditSelect = async (post) => {
-    setSelectedPost(post);
-    setIsEditSelectModalVisible(false);
-
-    form.setFieldsValue({ title: post.title });
-    setEditorContent(post.content); 
-    setIsEditModalVisible(true);
-  };
-
-  // Update Post
-  const handleUpdate = async () => {
-    try {
-      const values = await form.validateFields();
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("content", editorContent);
-
-      await axios.put(`http://localhost:8000/posts/${selectedPost.id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-
-      notification.success({
-        message: 'Success',
-        description: 'Post updated successfully!',
-      });
-
-      setIsEditModalVisible(false);
-      setSelectedPost(null);
-      form.resetFields();
-    } catch (error) {
-      console.error("Error updating post:", error);
-      notification.error({
-        message: 'Error',
-        description: 'Failed to update the post. Please try again.',
-      });
-    }
-  };
-
-  return (
-    <Content style={{ margin: '0 16px', position: 'relative' }}>
-      <Breadcrumb
-        style={{ margin: '16px 0' }}
-        items={[
-          { title: 'PawMatch' },
-          { title: 'Forum' }
-        ]}
-      />
-
-      <FloatButton.Group
-        trigger="click"
-        type="primary"
-        style={{
-          position: 'fixed',
-          right: 24,
-          bottom: 24,
-        }}
-        icon={<FileOutlined />}
-      >
-        <FloatButton icon={<PlusOutlined />} onClick={showCreateModal} />
-        <FloatButton icon={<EditOutlined />} onClick={showEditSelectModal} />
-      </FloatButton.Group>
-
-      {/* Modal for Creating Forum Post */
- /*     <Modal
-        title="Create Forum Post"
-        open={isCreateModalVisible}
-        onOk={handleSubmit}
-        onCancel={handleCancel}
-        okText="Submit"
-        cancelText="Cancel"
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="title"
-            label="Title"
-            rules={[{ required: true, message: 'Please enter a title' }]}
-          >
-            <Input placeholder="Enter post title" />
-          </Form.Item>
-
-          <Form.Item label="Content">
-            <Editor
-              apiKey="h9e9s3voc97017ejamk2taurl6qsi1d0y7n2pwz0vbh1mbyr"
-              value={editorContent}
-              init={{ 
-                height: 300,
-                menubar: true,
-                plugins: [
-                    'advlist', 'autolink', 'link', 'image', 'lists', 'charmap', 'preview', 'anchor', 'pagebreak',
-                    'searchreplace', 'wordcount', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media',
-                    'table', 'emoticons', 'help'
-                  ],
-                  toolbar:
-                    'undo redo | formatselect | bold italic backcolor | ' +
-                    'alignleft aligncenter alignright alignjustify | ' +
-                    'bullist numlist outdent indent | removeformat | help',
-                }}
-              onEditorChange={handleEditorChange}
-            />
-          </Form.Item>
-
-          <Form.Item name="images" label="Upload Images">
-            <Upload
-              listType="picture"
-              fileList={fileList}
-              beforeUpload={() => false}
-              onChange={handleImageUpload}
-              multiple
-            >
-              <Button icon={<UpCircleOutlined />}>Select Images</Button>
-            </Upload>
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Modal for Selecting Post to Edit */
- /*     <Modal
-        title="Select Post to Edit"
-        open={isEditSelectModalVisible}
-        onCancel={() => setIsEditSelectModalVisible(false)}
-        footer={null}
-      >
-        <List
-          dataSource={userPosts}
-          renderItem={(item) => (
-            <List.Item
-              actions={[<Button onClick={() => handleEditSelect(item)}>Edit</Button>]}
-            >
-              {item.title}
-            </List.Item>
-          )}
-        />
-      </Modal>
-
-      {/* Modal for Editing Forum Post */
- /*     <Modal
-        title="Edit Forum Post"
-        open={isEditModalVisible}
-        onOk={handleUpdate}
-        onCancel={handleCancel}
-        okText="Update"
-        cancelText="Cancel"
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="title"
-            label="Title"
-            rules={[{ required: true, message: 'Please enter a title' }]}
-          >
-            <Input placeholder="Enter post title" />
-          </Form.Item>
-
-          <Form.Item label="Content">
-            <Editor
-              apiKey="h9e9s3voc97017ejamk2taurl6qsi1d0y7n2pwz0vbh1mbyr"
-              value={editorContent}
-              init={{ 
-                height: 300,
-                menubar: true,
-                plugins: [
-                    'advlist', 'autolink', 'link', 'image', 'lists', 'charmap', 'preview', 'anchor', 'pagebreak',
-                    'searchreplace', 'wordcount', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media',
-                    'table', 'emoticons', 'help'
-                  ],
-                  toolbar:
-                    'undo redo | formatselect | bold italic backcolor | ' +
-                    'alignleft aligncenter alignright alignjustify | ' +
-                    'bullist numlist outdent indent | removeformat | help',
-                }}
-              onEditorChange={handleEditorChange}
-            />
-          </Form.Item>
-
-          <Form.Item name="images" label="Upload Images">
-            <Upload
-              listType="picture"
-              fileList={fileList}
-              beforeUpload={() => false}
-              onChange={handleImageUpload}
-              multiple
-            >
-              <Button icon={<UpCircleOutlined />}>Select Images</Button>
-            </Upload>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </Content>
-  );
-};
-
-export default ContentComponent; */
-
-
-{/*import React, { useState, useEffect } from 'react';
-import IconText from './IconText'; // Assuming you have a component for icons
-import {
-  Breadcrumb,
-  Layout,
-  List,
-  Avatar,
-  Modal,
-  Form,
-  Input,
-  Button,
-  notification,
-  theme,
-  Upload,
-  FloatButton,
-} from 'antd';
-import { MessageOutlined, FileOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
-import { Editor } from '@tinymce/tinymce-react';
-import axios from 'axios';
-
-const { Content } = Layout;
-
-const ContentComponent = () => {
-  const {
-    token: { colorBgContainer, borderRadiusLG },
-  } = theme.useToken();
-
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isEditListVisible, setIsEditListVisible] = useState(false); // Modal to list user's posts
-  const [isEditing, setIsEditing] = useState(false);
-  const [currentPostId, setCurrentPostId] = useState(null);
-  const [form] = Form.useForm();
-  const [editorContent, setEditorContent] = useState("");
-  const [fileList, setFileList] = useState([]);
-  const [data, setData] = useState([]); // All posts
-  const [userPosts, setUserPosts] = useState([]); // User's posts
-
-  // Fetch all posts on component mount
-  useEffect(() => {
-    fetchAllPosts();
-  }, []);
-
-  const fetchAllPosts = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/posts');
-      setData(response.data);
-    } catch (error) {
-      console.error("Error fetching posts:", error);
-      notification.error({ message: 'Failed to fetch posts.' });
-    }
-  };
-
-  const fetchUserPosts = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/user/posts');
-      setUserPosts(response.data);
-      setIsEditListVisible(true);
-    } catch (error) {
-      console.error("Error fetching user posts:", error);
-      notification.error({ message: 'Failed to fetch user posts.' });
-    }
-  };
-
-  const showModal = () => {
-    form.resetFields();
-    setEditorContent("");
-    setFileList([]);
-    setIsEditing(false);
-    setIsModalVisible(true);
-  };
-
-  const showEditModal = async (postId) => {
-    try {
-      const response = await axios.get(`http://localhost:8000/api/posts/${postId}`);
-      const postData = response.data;
-
-      form.setFieldsValue({ title: postData.title });
-      setEditorContent(postData.content);
-      setFileList(
-        postData.images.map((image, index) => ({
-          uid: index,
-          name: `image-${index}.png`,
-          status: 'done',
-          url: image,
-        }))
-      );
-      
-      setCurrentPostId(postId);
-      setIsEditing(true);
-      setIsModalVisible(true);
-    } catch (error) {
-      console.error("Error fetching post data:", error);
-      notification.error({ message: 'Failed to fetch post data.' });
-    }
-  };
-
-  const handleSubmit = async () => {
-    try {
-      const values = await form.validateFields();
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("content", editorContent);
-      fileList.forEach((file) => formData.append("images[]", file.originFileObj || file.url));
-
-      if (isEditing) {
-        await axios.put(`http://localhost:8000/api/posts/${currentPostId}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        notification.success({ message: 'Post updated successfully!' });
-      } else {
-        await axios.post('http://localhost:8000/api/posts', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        notification.success({ message: 'Post created successfully!' });
-      }
-
-      form.resetFields();
-      setEditorContent("");
-      setFileList([]);
-      setIsModalVisible(false);
-      setIsEditListVisible(false);
-      fetchAllPosts(); // Refresh the post list
-    } catch (error) {
-      console.error("Error submitting the post:", error);
-      notification.error({ message: 'Failed to submit the post.' });
-    }
-  };
-
-  const handleEditorChange = (content) => {
-    setEditorContent(content);
-  };
-
-  const handleImageUpload = ({ fileList }) => {
-    setFileList(fileList);
-    return false;
-  };
-
-  const handleCancel = () => {
-    form.resetFields();
-    setEditorContent("");
-    setFileList([]);
-    setIsModalVisible(false);
-    setIsEditListVisible(false);
-  };
-
-  return (
-    <Content style={{ margin: '0 16px', position: 'relative' }}>
-      <Breadcrumb style={{ margin: '16px 0' }}>
-        <Breadcrumb.Item>PawMatch</Breadcrumb.Item>
-        <Breadcrumb.Item>Forum</Breadcrumb.Item>
-      </Breadcrumb>
-
-      <div style={{ padding: 24, minHeight: 360, background: colorBgContainer, borderRadius: borderRadiusLG }}>
-        <List
-          itemLayout="vertical"
-          size="large"
-          pagination={{ pageSize: 3 }}
-          dataSource={data}
-          renderItem={(item) => (
-            <List.Item
-              key={item.title}
-              actions={[<IconText icon={MessageOutlined} text="2" key="list-vertical-message" />]}
-              extra={<img width={272} alt="logo" src="https://gw.alipayobjects.com/zos/rmsportal/mqaQswcyDLcXyDKnZfES.png" />}
-            >
-              <List.Item.Meta
-                avatar={<Avatar src={item.avatar} />}
-                title={<a href={item.href}>{item.title}</a>}
-                description={item.description}
-              />
-              {item.content}
-            </List.Item>
-          )}
-        />
-      </div>
-
-      {/* FloatButton Group*/}
-  {/*    <FloatButton.Group
-        trigger="click"
-        type="primary"
-        style={{ position: 'fixed', right: 24, bottom: 24 }}
-        icon={<FileOutlined />}
-      >
-        <FloatButton icon={<PlusOutlined />} onClick={showModal} />
-        <FloatButton icon={<EditOutlined />} onClick={fetchUserPosts} />
-      </FloatButton.Group>
-
-      {/* Modal for listing user's posts */}
- {/*     <Modal
-        title="Select a Post to Edit"
-        open={isEditListVisible}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <List
-          itemLayout="horizontal"
-          dataSource={userPosts}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Button icon={<EditOutlined />} onClick={() => showEditModal(item.id)}>Edit</Button>
-              ]}
-            >
-              <List.Item.Meta
-                avatar={<Avatar src={item.avatar} />}
-                title={item.title}
-                description={item.content}
-              />
-            </List.Item>
-          )}
-        />
-      </Modal>
-
-      {/* Modal for Create or Edit Forum Post */}
-{/*      <Modal
-        title={isEditing ? "Edit Forum Post" : "Create Forum Post"}
-        open={isModalVisible}
-        onOk={handleSubmit}
-        onCancel={handleCancel}
-        okText={isEditing ? "Update" : "Submit"}
-        cancelText="Cancel"
-      >
-        <Form form={form} layout="vertical">
-          <Form.Item
-            name="title"
-            label="Title"
-            rules={[{ required: true, message: 'Please enter a title' }]}
-          >
-            <Input placeholder="Enter post title" />
-          </Form.Item>
-
-          {/* TinyMCE Editor for Content */}
- {/*         <Form.Item label="Content">
-            <Editor
-              apiKey="h9e9s3voc97017ejamk2taurl6qsi1d0y7n2pwz0vbh1mbyr"
-              value={editorContent}
-              init={{
-                height: 300,
-                menubar: true,
-                plugins: [
-                  'advlist', 'autolink', 'link', 'image', 'lists', 'charmap', 'preview', 'anchor', 'pagebreak',
-                  'searchreplace', 'wordcount', 'visualblocks', 'code', 'fullscreen', 'insertdatetime', 'media',
-                  'table', 'emoticons', 'help'
-                ],
-                toolbar:
-                  'undo redo | formatselect | bold italic backcolor | ' +
-                  'alignleft aligncenter alignright alignjustify | ' +
-                  'bullist numlist outdent indent | removeformat | help',
-              }}
-              onEditorChange={handleEditorChange}
-            />
-          </Form.Item>
-
-          {/* Image Upload */}
-{/*          <Form.Item name="images" label="Upload Images">
-            <Upload
-              listType="picture"
-              fileList={fileList}
-              beforeUpload={handleImageUpload}
-              onRemove={(file) => setFileList(fileList.filter((item) => item.uid !== file.uid))}
-            >
-              <Button icon={<PlusOutlined />}>Upload</Button>
-            </Upload>
-          </Form.Item>
-        </Form>
-      </Modal>
-    </Content>
-  );
-};
-
-export default ContentComponent;*/}
 
