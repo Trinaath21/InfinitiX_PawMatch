@@ -20,7 +20,7 @@ import AddDonation from '../Donation/AddDonation';
 import ViewAllDonation from '../Donation/ViewAllDonation';
 import ViewMyDonation from '../Donation/ViewMyDonation';
 //stray
-
+import PersonalStrayListings from '../Stray/PersonalStrayListings';
 //
 const { Content } = Layout;
 
