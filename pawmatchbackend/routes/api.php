@@ -36,3 +36,20 @@ Route::delete('/posts/{post_id}', [ForumPostController::class, 'destroy']);
 Route::get('/posts/{post_id}/comments', [ForumPostController::class,'getComments']);
 Route::get('posts/{post_id}/comments', [CommentController::class, 'index']);
 Route::post('comments', [CommentController::class, 'store']);
+
+//donation module 
+Route::post('/donations', [DonationController::class, 'store']);
+Route::get('/donations/{shelter_id}', [DonationController::class, 'show']);
+Route::post('/donations/{shelter_id}', [DonationController::class, 'update']);
+Route::get('/shelter', [DonationController::class, 'fetchShelters']);
+Route::get('/shelter/{shelter_id}/donations', [DonationController::class, 'fetchShelterDonations']);
+    
+//stray module
+Route::post('/add-stray-report', [StrayReportController::class, 'store']);
+Route::post('/getAllStrayReports', [StrayReportController::class, 'getAllStrayReports']);
+Route::post('/deleteStrayReport', [StrayReportController::class, 'deleteStrayReport']);
+Route::post('/getAllStrayReportsByUserID', [StrayReportController::class, 'getAllStrayReportsByUserID']);
+Route::post('/editStrayReport', [StrayReportController::class, 'updateStrayReport']);
+Route::post('/getSpecificStrayReport', [StrayReportController::class, 'getSpecificStrayReport']);
+
+
