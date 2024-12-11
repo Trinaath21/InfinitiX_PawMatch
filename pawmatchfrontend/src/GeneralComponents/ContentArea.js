@@ -2,10 +2,19 @@
 import React from 'react';
 import { Layout, theme } from 'antd';
 import { Routes, Route } from 'react-router-dom';
+//lostFound
 import PersonalListing from '../LostFoundReport/PersonalListing';
 import ViewMoreDetails from '../LostFoundReport/ViewMoreDetails'; // Import the ViewMoreDetails component
 import PublicLostPetListings from '../LostFoundReport/PublicLostPetListings';
 import ViewReplyReport from '../LostFoundReport/ViewReplyReport';
+//adoption
+import AddAdoption from "../Adoption/AddAdoption.js";
+import EditAdoption from "../Adoption/EditAdoption.js";
+import ViewPersonalListing from "../Adoption/ViewPersonalListing.js";
+import ApplyAdoption from "../Adoption/ApplyAdoption.js";
+import ViewMoreAdoption from "../Adoption/ViewMoreAdoption.js";
+import ViewPublicListing from "../Adoption/ViewPublicListing.js";
+//
 const { Content } = Layout;
 
 const ContentArea = () => {
@@ -24,12 +33,23 @@ const ContentArea = () => {
       }}
     >
       <Routes>
+        //lostFound
         <Route path="/" element={<PublicLostPetListings />} /> 
         <Route path="/publicLostReportList" element={<PublicLostPetListings />} /> 
         <Route path="/personalReportlisting" element={<PersonalListing />} /> 
         <Route path="/viewMoreDetails" element={<ViewMoreDetails />} /> 
         <Route path="/viewMoreDetails/:id" element={<ViewMoreDetails />} />
         <Route path="/viewReplyReport" element={<ViewReplyReport />} />
+
+        //Adoption
+        <Route path="/" element={<ViewPublicListing />} />
+        <Route path="/addAdoption" element={<AddAdoption />} />
+        <Route path="/editAdoption" element={<EditAdoption />} />
+        <Route path="/editAdoption/:id" element={<EditAdoption />} />
+        <Route path="/viewPersonalListing" element={<ViewPersonalListing />} />
+        <Route path="/applyAdoption" element={<ApplyAdoption />} />
+        <Route path="/ViewMoreAdoption" element={<ViewMoreAdoption />} />
+        <Route path="/ViewPublicListing" element={<ViewPublicListing />} />
 
       </Routes>
     </Content>
