@@ -5,6 +5,8 @@ use App\Http\Controllers\ForumPostController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\AdoptionPostController;
 use App\Http\Controllers\AdoptionApplicationController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\StrayReportController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
