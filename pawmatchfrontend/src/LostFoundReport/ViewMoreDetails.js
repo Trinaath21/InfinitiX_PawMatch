@@ -11,7 +11,7 @@ const ViewMoreDetails = () => {
   const role = parseInt(localStorage.getItem('role'), 10);
   const [isBackVisible, setIsBackVisible] = useState(true);
   //const userID = parseInt(localStorage.getItem('userID'), 10); //ask zhang to add.
-  let userID = 1;
+  let userID = 3;
   const [loading, setLoading] = useState(true);
   const { Title, Text } = Typography;
   const [caseInfo, setCaseInfo] = useState({});
@@ -44,6 +44,9 @@ const ViewMoreDetails = () => {
   }, [location.state]);
 
 
+  
+
+
   const handleAddNewReport = () => {
     setIsModalVisible(true);
 };
@@ -67,7 +70,7 @@ const handleCloseModal = () => {
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
           <Button
             type="primary"
-            onClick={() => navigate('/previousPage')}
+            onClick={() => navigate(page)}
             style={{ backgroundColor: '#004b80' }}
           >
             Back

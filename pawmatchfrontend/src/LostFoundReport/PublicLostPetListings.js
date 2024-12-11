@@ -24,7 +24,7 @@ const PublicLostPetListings = () => {
     const fetchReportData = async () => {
       try {
         const response = await axios.post('http://localhost:8000/api/getAllReports',{
-          userID: 2 //later must use localStorage.
+          userID: 3 //later must use localStorage.
       }); 
         console.log("report_data",response.data);
         setReportData(response.data.data);

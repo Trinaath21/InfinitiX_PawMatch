@@ -353,40 +353,43 @@ class LostFoundController extends Controller
         public function getAllReports(Request $request)
         {
             try {
-                $excludedUserId = $request->input('userID'); // Assuming 'user_id' is sent in the request
-
+                $excludedUserId = $request->input('userID'); // Get the excluded user ID from the request
+        
                 $reports = DB::table('reportlostfound')
                     ->join('member', 'reportlostfound.user_id', '=', 'member.user_id')
                     ->where('reportlostfound.status', 'active')
-                    ->where('reportlostfound.user_id', '!=', $excludedUserId)
+                    ->whereNotIn('reportlostfound.report_id', function ($subquery) use ($excludedUserId) {
+                        $subquery->select('replylostreport.report_id')
+                                 ->from('replylostreport')
+                                 ->where('replylostreport.user_id', $excludedUserId);
+                    })
                     ->select(
                         'reportlostfound.*',
                         'member.*',
                         'reportlostfound.district as district',
                         'reportlostfound.state as state'
-                    ) // Include specific fields
+                    )
                     ->get();
-                
-                
-                
-            
         
+                // Encode images in the reports
                 $reports = $reports->map(function ($report) {
-                    if ($report->image !== null) {
-                        $report->image = base64_encode($report->image);
-                    } else {
-                        $report->image = null;
-                    }
+                    $report->image = $report->image ? base64_encode($report->image) : null;
                     return $report;
                 });
         
                 // Return the reports as a JSON response
                 return response()->json(['success' => true, 'data' => $reports], 200);
+        
             } catch (\Exception $e) {
-                // Handle any errors and return a 500 response
-                return response()->json(['success' => false, 'message' => 'Error retrieving reports'], 500);
+                // Log the exception for debugging purposes (optional)
+                //\Log::error('Error retrieving reports: ' . $e->getMessage());
+        
+                // Return an error response with a message
+                return response()->json(['success' => false, 'message' => 'Error retrieving reports. ' . $e->getMessage()], 500);
             }
         }
+        
+        
 
 
         public function getReplyReportsByReportID(Request $request)
