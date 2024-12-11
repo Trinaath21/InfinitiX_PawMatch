@@ -14,6 +14,13 @@ import ViewPersonalListing from "../Adoption/ViewPersonalListing.js";
 import ApplyAdoption from "../Adoption/ApplyAdoption.js";
 import ViewMoreAdoption from "../Adoption/ViewMoreAdoption.js";
 import ViewPublicListing from "../Adoption/ViewPublicListing.js";
+//donation
+import EditDonation from '../Donation/EditDonation';
+import AddDonation from '../Donation/AddDonation';
+import ViewAllDonation from '../Donation/ViewAllDonation';
+import ViewMyDonation from '../Donation/ViewMyDonation';
+//stray
+
 //
 const { Content } = Layout;
 
@@ -51,6 +58,14 @@ const ContentArea = () => {
         <Route path="/ViewMoreAdoption" element={<ViewMoreAdoption />} />
         <Route path="/ViewPublicListing" element={<ViewPublicListing />} />
 
+        //Donation
+        <Route path="/" element={<ViewMyDonation/>} /> 
+        <Route path="/edit-donation/:shelterId" element={<EditDonation />} />
+        <Route path="/" element={<AddDonation/>} /> 
+        <Route path="/" element={<ViewAllDonation/>} />
+
+        //Stray
+        <Route path="/" element={<PersonalStrayListings/>} />
       </Routes>
     </Content>
   );
