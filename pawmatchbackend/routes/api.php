@@ -7,6 +7,10 @@ use App\Http\Controllers\AdoptionPostController;
 use App\Http\Controllers\AdoptionApplicationController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\StrayReportController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\ShelterController;
+use App\Http\Controllers\MemberProfileController;
+use App\Http\Controllers\ShelterProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -66,4 +70,19 @@ Route::post('/getSpecificPost', [AdoptionPostController::class, 'viewMore']);
 Route::post('/deleteAdoptionPost', [AdoptionPostController::class, 'deleteAdoptionPost']);
 Route::post('/apply-adoption', [AdoptionApplicationController::class, 'store']);
 
+//login register module
+Route::post('/member/register', [MemberController::class, 'register']);
+Route::post('/shelter/register', [ShelterController::class, 'shelterregister']);
+Route::post('/member/login', [MemberController::class, 'login']);
+Route::post('/shelter/login', [ShelterController::class, 'shelterlogin']);
+
+//Profile module
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('show', [MemberProfileController::class, 'show']);
+    Route::put('updateProfile', [MemberProfileController::class, 'updateProfile']);
+});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('showShelterProfile', [ShelterProfileController::class, 'showShelterProfile']);
+    Route::put('updateShelterProfile', [ShelterProfileController::class, 'updateShelterProfile']);
+});
 
