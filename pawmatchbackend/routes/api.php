@@ -3,6 +3,8 @@
 use App\Http\Controllers\LostFoundController;
 use App\Http\Controllers\ForumPostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\AdoptionPostController;
+use App\Http\Controllers\AdoptionApplicationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -51,5 +53,15 @@ Route::post('/deleteStrayReport', [StrayReportController::class, 'deleteStrayRep
 Route::post('/getAllStrayReportsByUserID', [StrayReportController::class, 'getAllStrayReportsByUserID']);
 Route::post('/editStrayReport', [StrayReportController::class, 'updateStrayReport']);
 Route::post('/getSpecificStrayReport', [StrayReportController::class, 'getSpecificStrayReport']);
+
+//adoption module
+Route::post('/add-adoption-posts', [AdoptionPostController::class, 'store']);
+Route::get('/adoption-posts/{adoption_post_id}', [AdoptionPostController::class, 'show']);
+Route::post('/adoption-posts/{adoption_post_id}', [AdoptionPostController::class, 'update']);
+Route::get('/adoption-posts', [AdoptionPostController::class, 'getPostsByUser']);
+Route::get('/get-public-adoption-posts', [AdoptionPostController::class, 'getPostsByUserPublic']);
+Route::post('/getSpecificPost', [AdoptionPostController::class, 'viewMore']);
+Route::post('/deleteAdoptionPost', [AdoptionPostController::class, 'deleteAdoptionPost']);
+Route::post('/apply-adoption', [AdoptionApplicationController::class, 'store']);
 
 
