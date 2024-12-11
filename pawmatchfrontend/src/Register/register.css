@@ -1,0 +1,82 @@
+/* Scope styles to only affect elements within the register-container */
+.register-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+.register-container h1,
+.register-container label {
+  color: #333333;
+}
+
+/* Form layout adjustments */
+.register-container .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.register-container .ant-form-item-label > label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #555555;
+}
+
+/* Input fields and dropdowns */
+.register-container .ant-input,
+.register-container .ant-select-selector {
+  border-radius: 5px;
+}
+
+/* Upload button */
+.register-container .ant-upload .ant-btn {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+}
+
+.register-container .ant-upload .ant-btn:hover {
+  background-color: #45a049;
+  color: #fff;
+}
+
+/* Primary buttons */
+.register-container .ant-btn-primary {
+  width: 100%;
+  background-color: #1a73e8;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  padding: 10px;
+}
+
+.register-container .ant-btn-primary:hover {
+  background-color: #1669c2;
+}
+
+/* Agreement checkbox */
+.register-container .ant-checkbox-wrapper {
+  font-size: 13px;
+  color: #666666;
+}
+
+.register-container a {
+  color: #1a73e8;
+}
+
+.register-container a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .register-container {
+    padding: 15px;
+  }
+
+  .register-container .ant-form-item-label > label {
+    font-size: 13px;
+  }
+}
