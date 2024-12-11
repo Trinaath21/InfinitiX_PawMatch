@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Button, Form, Input, InputNumber, Select, DatePicker, Typography, Row, Col, message} from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function ApplyAdoption() {
     const { TextArea } = Input;
     const { Title } = Typography;
     const { Content } = Layout;
+    const location = useLocation();
+    // const userID = parseInt(localStorage.getItem('userID'), 10); //ask zhang to add.
+    const userID = 22;
+    const postID = location.state?.adoption_post_id;
     const [formData, setFormData] = useState({
         applicant_name: '',
         applicant_age: 0,
         phone_number: '',
         current_pets_count: 0,
-        previous_pet_experience: 'Yes',
+        address: '',
+        previous_pet_experience: 'None',
+        user_id: userID,
+        adoption_post_id: postID,
         //application_date: null,
         //status: 'Pending',
     });
@@ -96,13 +104,17 @@ function ApplyAdoption() {
                             </Col>
                             <Col span={12}>
                                 <Form.Item label="Current Pets Count" name="current_pets_count" rules={[{ required: true, message: 'Please input your current pets count!' }]}>                                
-                                    <InputNumber name="current_pets_count" value={formData.current_pets_count} onChange={(value) => handleSelectChange(value, 'current_pets_count')} placeholder="Enter current pets count" style={{ width: '100%' }} />
+                                    <InputNumber name="current_pets_count" value={formData.current_pets_count} onChange={(value) => handleSelectChange(value, 'current_pets_count')} placeholder="Enter current pets count (0 if none)" style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
                         </Row>
 
-                        <Form.Item label="Previous Pet Experience" name="previous_pet_experience" rules={[{ required: true, message: 'Please select your experience!' }]}>                            
-                            <TextArea name="previous_pet_experience" value={formData.previous_pet_experience} onChange={handleChange} rows={5} placeholder="Describe your experience with your current and previous pets"/>
+                        <Form.Item label="House Address" name="address" rules={[{ required: true, message: 'Please enter your address!' }]}>                            
+                            <TextArea name="address" value={formData.address} onChange={handleChange} rows={3} placeholder="Enter your house address"/>
+                        </Form.Item>
+
+                        <Form.Item label="Pet Experience" name="previous_pet_experience" rules={[{ required: true, message: 'Please describe your experience!' }]}>                            
+                            <TextArea name="previous_pet_experience" value={formData.previous_pet_experience} onChange={handleChange} rows={3} placeholder="Describe your experience with your current and previous pets (Enter None if not applicable)"/>
                         </Form.Item>
 
                         {/* <Form.Item label="Application Date" name="application_date" rules={[{ required: true, message: 'Please select the application date!' }]}>                            

@@ -32,6 +32,8 @@ class PetAdoptionPost extends Model
         'vaccination_status', 
         'spayed_neutered_status', 
         'health_issues', 
+        'state', 
+        'district', 
         'current_location', 
         'adoption_fee', 
         'status', 

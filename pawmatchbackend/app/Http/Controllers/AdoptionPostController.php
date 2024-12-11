@@ -10,6 +10,8 @@ class AdoptionPostController extends Controller
 {
     public function store(Request $request)
     {
+        $id = $request->input("id");
+        
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'species' => 'required|string|max:50',
@@ -22,7 +24,10 @@ class AdoptionPostController extends Controller
             'vaccinationStatus' => 'required',
             'spayedNeuteredStatus' => 'required',
             'healthIssues' => 'nullable|string',
+            'district' => 'required|string',
+            'state' => 'required|string',
             'currentLocation' => 'required|string',
+            'extra_info' => 'nullable|string',
             'adoptionFee' => 'nullable|numeric|min:0',
             'petImage' => 'required|image|mimes:jpeg,png,jpg,gif|max:1000000',
         ]);
@@ -39,9 +44,12 @@ class AdoptionPostController extends Controller
         $post->vaccination_status = $validatedData['vaccinationStatus'];
         $post->spayed_neutered_status = $validatedData['spayedNeuteredStatus'];
         $post->health_issues = $validatedData['healthIssues'];
+        $post->district = $validatedData['district'];
+        $post->state = $validatedData['state'];
         $post->current_location = $validatedData['currentLocation'];
+        $post->extra_info = $validatedData['extra_info'];
         $post->adoption_fee = $validatedData['adoptionFee'];
-        $post->id = 21;  // Temporary user ID
+        $post->id = $id;  // Temporary user ID
         $post->status = 'available';
         $post->isFromShelter = 0;
 
@@ -97,7 +105,10 @@ class AdoptionPostController extends Controller
             'vaccination_status' => 'required',
             'spayed_neutered_status' => 'required',
             'health_issues' => 'nullable|string',
+            'district' => 'required|string',
+            'state' => 'required|string',
             'current_location' => 'required|string',
+            'extra_info' => 'nullable|string',
             'adoption_fee' => 'nullable|numeric|min:0',
             'status' => 'required',
             'petImage' => 'required|file|mimes:jpeg,png,jpg,gif|max:1000000',
@@ -136,16 +147,48 @@ class AdoptionPostController extends Controller
 
     public function getPostsByUser(Request $request)
     {
-        $userId = $request->query('id');
+        $id = $request->query('id');
 
-        if (!$userId) {
+        if (!$id) {
             return response()->json([
                 'error' => 'id query parameter is required.'
             ], 400);
         }
 
         // Fetch posts based on the provided user ID
-        $posts = PetAdoptionPost::where('id', $userId)->get();
+        $posts = PetAdoptionPost::where('id', $id)->get();
+
+        if ($posts->isEmpty()) {
+            return response()->json(['error' => 'No posts found for this user'], 404);
+        }
+
+        // Process each post to handle the pet image
+        $posts = $posts->map(function ($post) {
+            if ($post->petImage) {
+                // Determine MIME type for the image data
+                $mimeType = finfo_buffer(finfo_open(), $post->petImage, FILEINFO_MIME_TYPE);
+
+                // Encode the image as Base64 and attach it with the MIME type
+                $post->petImage = 'data:' . $mimeType . ';base64,' . base64_encode($post->petImage);
+            }
+            return $post;
+        });
+
+        return response()->json($posts, 200);
+    }
+
+    public function getPostsByUserPublic(Request $request)
+    {
+        $id = $request->query('id');
+
+        if (!$id) {
+            return response()->json([
+                'error' => 'id query parameter is required.'
+            ], 400);
+        }
+
+        // Fetch posts based on the provided user ID
+        $posts = PetAdoptionPost::where('id', $id)->get();
 
         if ($posts->isEmpty()) {
             return response()->json(['error' => 'No posts found for this user'], 404);

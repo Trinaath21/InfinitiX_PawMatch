@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import MUIDataTable from "mui-datatables";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { Layout, Button, Space, Modal, message } from 'antd';
+import { Layout, Button, Row, Col, Space, Modal, message } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import axios from "axios";
 import { CacheProvider } from "@emotion/react";
@@ -13,6 +13,7 @@ import { CardMedia } from "@mui/material";
 import { styled } from '@mui/material/styles';
 import FooterBar from '../General Components/FooterBar.js';
 import Sidebar from '../General Components/SideBar.js';
+import { useNavigate, useParams } from "react-router-dom";
 
 
 
@@ -59,9 +60,10 @@ const theme = createTheme({
   },
 });
 
-function ViewPersonalListing({ id }) {
+function ViewPersonalListing() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   //const { Title } = Typography;
   const { Content, Footer, Sider } = Layout;
   const [collapsed, setCollapsed] = useState(false);
@@ -69,10 +71,19 @@ function ViewPersonalListing({ id }) {
     setCollapsed(!collapsed);
   };
 
+  // const id = localStorage.getItem('id') || 21; // Uncomment this later for real usage
+  const id = 21; // Hardcoded for now
+
+
   const refreshTableData = async () => {
+    if (!id) {
+      console.error("ID is undefined. Cannot fetch data.");
+      return;
+    }
     setLoading(true); // Show loading indicator
     try {
       const response = await axios.get(`http://localhost:8000/api/adoption-posts?id=${id}`);
+      console.log("Fetched data:", response.data);
       const adoptionData = response.data.map(post => ({
         name: post.name,
         species: post.species,
@@ -91,12 +102,26 @@ function ViewPersonalListing({ id }) {
         petImage: post.petImage,
         adoption_post_id: post.adoption_post_id, // Assume each post has an ID
       }));
-      setData(adoptionData); // Update table data state
+
+      const sortedData = adoptionData.sort((a, b) => b.adoption_post_id - a.adoption_post_id);
+
+
+      setData(sortedData); // Update table data state
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false); // Hide loading indicator
     }
+  };
+
+  const handleViewMore = (adoption_post_id) => {
+    console.log("Viewing details for post id:", adoption_post_id);
+    navigate('/ViewMoreAdoption', { state: { adoption_post_id: adoption_post_id, page:"/viewPersonalListing" } });
+  };
+
+  const handleEdit = (adoption_post_id) => {
+    // Navigate to EditAdoption with the adoption_post_id
+    navigate(`/editAdoption`, { state: { adoption_post_id } });
   };
 
   const handleDelete = (adoption_post_id) => {
@@ -126,6 +151,11 @@ function ViewPersonalListing({ id }) {
     });
   };
 
+  const handleAddAdoptionPost = () => {
+    // Navigate to EditAdoption with the adoption_post_id
+    navigate(`/addAdoption`);
+  };
+
 
   useEffect(() => {
     refreshTableData();
@@ -137,7 +167,7 @@ function ViewPersonalListing({ id }) {
     { name: "species", label: "Species" },
     { name: "breed", label: "Breed" },
     { name: "age", label: "Age" },
-    { name: "gender", label: "Gender" },
+    // { name: "gender", label: "Gender" },
     //{ name: "size", label: "SIZE" },
     //{ name: "weight", label: "WEIGHT" },
     { name: "vaccination_status", label: "Vaccination Status" },
@@ -172,7 +202,8 @@ function ViewPersonalListing({ id }) {
         filter: false,
         sort: false,
         customBodyRender: (value, tableMeta) => {
-          const isAvailable = tableMeta.rowData[8] === "available"; // Adjust index 3 to your status column position
+          const isAvailable = tableMeta.rowData[7] === "available"; // Adjust index 3 to your status column position
+          const adoption_post_id = tableMeta.rowData[0]; 
 
           return (
             <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -189,6 +220,7 @@ function ViewPersonalListing({ id }) {
 
                 {/* View More Button */}
                 <Button
+                  onClick={() => handleViewMore(tableMeta.rowData[0])}
                   type="primary"
                   icon={<EyeOutlined />}
                   style={{ backgroundColor: '#e6f7ff', color: '#1890ff', borderColor: '#91d5ff' }}
@@ -201,6 +233,7 @@ function ViewPersonalListing({ id }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {/* Edit Button */}
                 <Button
+                  onClick={() => handleEdit(adoption_post_id)}
                   type="default"
                   icon={<EditOutlined />}
                   style={{
@@ -275,11 +308,6 @@ function ViewPersonalListing({ id }) {
     search: true,
   };
 
-  const handleEdit = (postId) => {
-    console.log(`Editing post with ID: ${postId}`);
-    // Implement edit functionality
-  };
-
   // const handleDelete = (postId) => {
   //   console.log(`Deleting post with ID: ${postId}`);
   //   // Implement delete functionality, such as sending a request to the backend
@@ -288,6 +316,17 @@ function ViewPersonalListing({ id }) {
   return (
     <div>
       <Content style={{ margin: '24px 16px 0' }}>
+        <div>
+        <Col span={24}>
+          <Button
+            type="primary"
+            onClick={handleAddAdoptionPost}
+            style={{ marginBottom: '20px' }}
+          >
+            Add Adoption Post
+          </Button>
+        </Col>
+        </div>
         <div style={{ width: '100%', maxWidth: '1200px', padding: '0px', background: '#fff', borderRadius: '8px', margin: 'auto' }}>
 
           <CacheProvider value={muiCache}>
