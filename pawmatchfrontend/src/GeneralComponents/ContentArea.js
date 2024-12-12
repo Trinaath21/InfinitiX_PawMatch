@@ -21,7 +21,10 @@ import ViewAllDonation from '../Donation/ViewAllDonation';
 import ViewMyDonation from '../Donation/ViewMyDonation';
 //stray
 import PersonalStrayListings from '../Stray/PersonalStrayListings';
-//
+//Forum
+import ContentComponent from './Forum/ForumPostComponent'; 
+import PostDetails from './Forum/PostDetails';
+
 const { Content } = Layout;
 
 const ContentArea = () => {
@@ -66,6 +69,11 @@ const ContentArea = () => {
 
         //Stray
         <Route path="/" element={<PersonalStrayListings/>} />
+
+        //Forum
+       <Route path="/forum" element={<ContentComponent />} />
+       <Route path="/post/:post_id" element={<PostDetails />} />
+  
       </Routes>
     </Content>
   );
