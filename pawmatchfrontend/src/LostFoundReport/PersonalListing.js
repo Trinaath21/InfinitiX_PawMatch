@@ -14,12 +14,12 @@ const PersonalListing = () => {
     const [loading, setLoading] = useState(false);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [selectedReport, setSelectedReport] = useState(null);
-
+    const userID = parseInt(localStorage.getItem('userID'), 10);
     const refreshTableData = async () => {
         setLoading(true); 
         try {
             const response = await axios.post('http://localhost:8000/api/getAllReportsByUserID', {
-                userID: 1 //later must use localStorage.
+                userID: userID //later must use localStorage.
             });
             setData(response.data.data); 
         } catch (error) {

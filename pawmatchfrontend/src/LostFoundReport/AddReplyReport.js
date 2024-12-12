@@ -129,11 +129,12 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
     const [location, setLocation] = useState(null);
-    const userID = 3; // Check for userID in localStorage
+    const role = parseInt(localStorage.getItem('role'), 10);
+    const userID = role === 'guest' ? 9999999 : parseInt(localStorage.getItem('userID'), 10);
 
     useEffect(() => {
         const fetchUserData = async () => {
-            if (userID) {
+            if (userID != 9999999) {
                 try {
                     const response = await axios.post(`http://localhost:8000/api/getSpecificUser`,{
                         user_id: userID,
@@ -191,7 +192,11 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
         }),
         onSubmit: async (values) => {
             const formData = new FormData();
-            formData.append('user_id', userID);
+            if(role ==="guest"){
+                formData.append('user_id', null);
+            }else{
+                formData.append('user_id', userID);
+            }
             formData.append('name', values.name);
             formData.append('report_id', report_id);
             const todayDate = moment().format('YYYY-MM-DD');
