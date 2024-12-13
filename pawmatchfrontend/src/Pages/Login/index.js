@@ -88,9 +88,22 @@ const Login = () => {
         // Store the token in localStorage
         localStorage.setItem(tokenKey, token); // Store only the token value
         console.log("Stored Token:", localStorage.getItem(tokenKey));
-
+        //Store the shelter_id (note the correct field name `shelter_id`)
+        if (role === "shelter") {
+          const shelterId = response.data.data.shelter_id; // 获取 shelter_id
+          localStorage.setItem("shelter_id", shelterId); // 存储 shelter_id
+          console.log("Stored Shelter ID:", localStorage.getItem("shelter_id"));
+        }
+        // Store the user_id (for members)
+        if (role === "member") {
+          const userId = response.data.data.user_id; // 获取 user_id
+          localStorage.setItem("user_id", userId); // 存储 user_id
+          console.log("Stored User ID:", localStorage.getItem("user_id"));
+        }
         // Store the role in localStorage
-        localStorage.setItem("role", role); // Store the role
+        localStorage.setItem("role", role);
+        // Store the role
+
         navigate("/main/home");
       }
     } catch (err) {

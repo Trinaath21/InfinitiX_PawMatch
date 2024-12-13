@@ -58,6 +58,7 @@ class ShelterController extends Controller
             'website_url' => $request->website_url,
             'description' => $request->description,
         ]);
+  
        
         return response()->json([
             'message' => 'Shelter registered successfully!',
@@ -90,9 +91,11 @@ class ShelterController extends Controller
         return response()->json([
             'message' => 'Shelter login successful',
             'data' => [
-                'shelter' => $shelter,
-                'token' => $token,
-            ],
+            'shelter_id' => $shelter->id,  // 添加 shelter_id
+            'shelter_name' => $shelter->shelter_name,
+            'email' => $shelter->email,
+            'token' => $token,
+        ],
         ], 200);
     }
 }

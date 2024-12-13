@@ -96,7 +96,9 @@ class MemberController extends Controller
         return response()->json([
             'message' => 'Login successful',
             'data' => [
-                'member' => $member,
+                'user_id' => $member->id,  // 添加 member_id
+                'member_name' => $member->name,
+                'email' => $member->email,
                 'token' => $token,
             ],
         ], 200);
