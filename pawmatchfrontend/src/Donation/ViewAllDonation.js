@@ -261,7 +261,7 @@ function ViewAllDonation() {
               <ExclamationCircleOutlined
                 style={{
                   fontSize: "48px",
-                  color: "#ff4d4f", // Eye-catching red color for the icon
+                  color: "#ff4d4f", 
                   marginBottom: "20px",
                 }}
               />

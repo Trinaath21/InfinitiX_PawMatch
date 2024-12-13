@@ -20,7 +20,9 @@ import AddDonation from '../Donation/AddDonation';
 import ViewAllDonation from '../Donation/ViewAllDonation';
 import ViewMyDonation from '../Donation/ViewMyDonation';
 //stray
+import PublicStrayListings from '../Stray/PublicStrayListings';
 import PersonalStrayListings from '../Stray/PersonalStrayListings';
+import ViewMoreStrayDetails from '../Stray/ViewMoreStrayDetails';
 //Forum
 import ContentComponent from './Forum/ForumPostComponent'; 
 import PostDetails from './Forum/PostDetails';
@@ -62,13 +64,15 @@ const ContentArea = () => {
         <Route path="/ViewPublicListing" element={<ViewPublicListing />} />
 
         //Donation
-        <Route path="/" element={<ViewMyDonation/>} /> 
+        <Route path="/ViewMyDonation" element={<ViewMyDonation/>} /> 
         <Route path="/edit-donation/:shelterId" element={<EditDonation />} />
-        <Route path="/" element={<AddDonation/>} /> 
-        <Route path="/" element={<ViewAllDonation/>} />
+        <Route path="/AddDonation" element={<AddDonation/>} /> 
+        <Route path="/ViewAllDonation" element={<ViewAllDonation/>} />
 
         //Stray
-        <Route path="/" element={<PersonalStrayListings/>} />
+        <Route path="/PublicStrayListings" element={<PublicStrayListings/>} /> 
+        <Route path="/ViewMoreStrayDetails" element={<ViewMoreStrayDetails />} /> 
+        <Route path="/PersonalStrayListings" element={<PersonalStrayListings/>} />
 
         //Forum
        <Route path="/forum" element={<ContentComponent />} />

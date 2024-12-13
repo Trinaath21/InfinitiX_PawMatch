@@ -4,7 +4,7 @@ import { Layout, Form, Input, Button, Upload, Col, Row, Typography, message, Mod
 import { PlusOutlined } from '@ant-design/icons';
 import FooterBar from '../GeneralComponents/FooterBar';
 import Sidebar from '../GeneralComponents/SideBar';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 
 
@@ -22,6 +22,7 @@ function EditDonation() {  //{ shelterId = 4 }
   const [collapsed, setCollapsed] = useState(false);
   const [initialImage, setInitialImage] = useState(null);
   const dataFetchedRef = useRef(false);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     if (!dataFetchedRef.current && shelterId) {
@@ -212,8 +213,11 @@ function EditDonation() {  //{ shelterId = 4 }
               </Row>
     
               <Form.Item style={{ textAlign: 'center', marginTop: '20px' }}>
-                <Button type="primary" htmlType="submit" loading={loading}>
+                <Button type="primary" htmlType="submit" loading={loading} style={{ marginRight: '10px' }}>
                   {loading ? 'Saving...' : 'Save'}
+                </Button>
+                <Button type="default" onClick={() => navigate('/ViewMyDonation')}>
+                  Back
                 </Button>
               </Form.Item>
             </Form>
