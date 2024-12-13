@@ -55,16 +55,14 @@ const PublicStrayListings = () => {
   // }, []);
 
   const filteredReports = reportData.filter((report) => {
-    const matchesDistrict = district ? report.district === district : true;
-    const matchesKeyword = searchKeyword
-      ? report.breed.toLowerCase().includes(searchKeyword.toLowerCase()) || report.breed.toLowerCase().includes(searchKeyword.toLowerCase())
-      : true;
+  const matchesDistrict = district ? report.district === district : true;
+  const matchesSpecies = searchKeyword ? report.species === searchKeyword : true; // Assuming "species" is a field in the report data
     
     const matchesDateRange = dateRange[0] && dateRange[1]
       ? moment(report.dateSighting).isBetween(dateRange[0].format("YYYY-MM-DD"), dateRange[1].format("YYYY-MM-DD"), 'day', '[]')
       : true;
   
-    return matchesDistrict && matchesKeyword && matchesDateRange;
+    return matchesDistrict && matchesSpecies && matchesDateRange;
   });
   
 
@@ -76,7 +74,7 @@ const PublicStrayListings = () => {
     setPage(page);
   };
   const handleCardClick = (reportID) => {
-    navigate('/viewMoreDetails', { state: { reportID } }); // Pass the report_id in the state
+    navigate('/ViewMoreStrayDetails', { state: { reportID } }); // Pass the report_id in the state
   };
 
   return (
@@ -103,13 +101,25 @@ const PublicStrayListings = () => {
           />
         </Col>
 
-        <Col xs={24} sm={12} md={8} lg={6}>
+        {/* <Col xs={24} sm={12} md={8} lg={6}>
           <Input
             placeholder="Search by Breed"
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
           />
-        </Col>
+        </Col> */}
+        <Col xs={24} sm={12} md={8} lg={6}>
+      <Select
+        placeholder="Search by Species"
+        style={{ width: '100%' }}
+        value={searchKeyword}
+        onChange={(value) => setSearchKeyword(value)}
+      >
+        <Option value="">All Species</Option>
+        <Option value="cat">Cat</Option>
+        <Option value="dog">Dog</Option>
+      </Select>
+  </Col>
       </Row>
 
       {loading ? (
@@ -129,8 +139,8 @@ const PublicStrayListings = () => {
                 <Card
                   cover={
                     <img 
-                      alt={report.pet_name} 
-                      src={`data:image/jpeg;base64,${report.image}`} 
+                      alt={report.breed} 
+                      src={`data:image/jpeg;base64,${report.images}`} 
                       style={{ objectFit: 'cover', height: 300, width: '100%' }} 
                     />
                   }
@@ -153,19 +163,25 @@ const PublicStrayListings = () => {
                   <Card.Meta 
                     description={
                       <Typography.Text ellipsis={{ tooltip: `Breed: ${report.breed}` }}>
-                        Breed: {report.colour}
+                        Breed: {report.breed}
                       </Typography.Text>
                     }
                   />
-                  <Typography.Text ellipsis style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    Colour: {report.colour}
-                  </Typography.Text> <br/>
-                  <Typography.Text ellipsis style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    Date of Sighting: {report.dateSighting}
-                  </Typography.Text>
-                  <Typography.Text ellipsis style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    Location: {report.location}
-                  </Typography.Text>
+                  <div>
+                    <Typography.Text ellipsis style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      Colour: {report.colour}
+                    </Typography.Text>
+                  </div>
+                  <div>
+                    <Typography.Text ellipsis style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      Date of Sighting: {report.dateSighting}
+                    </Typography.Text>
+                  </div>
+                  <div>
+                    <Typography.Text ellipsis style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      Location: {report.location}
+                    </Typography.Text>
+                  </div>
                 </Card>
 
                 </Tooltip>

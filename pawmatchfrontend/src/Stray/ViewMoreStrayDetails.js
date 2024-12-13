@@ -15,7 +15,7 @@ const ViewMoreStrayDetails = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const getSpecificReportData = async () => {
+    const getSpecificStrayReportData = async () => {
       try {
         const reportID = location.state?.reportID; 
         if (reportID) {
@@ -31,10 +31,12 @@ const ViewMoreStrayDetails = () => {
       }
     };
 
-    getSpecificReportData();
+    getSpecificStrayReportData();
   }, [location.state]);
 
-
+  const handleBack = () => {
+    navigate(-1); // Navigate back to the previous page
+  };
   const borderStyle = {
     border: '1px solid #ddd',
     padding: '10px',
@@ -69,7 +71,7 @@ const ViewMoreStrayDetails = () => {
     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
       <Button
         type="primary"
-        onClick={() => navigate('/PersonalStrayListings')}
+        onClick= {handleBack}
         style={{ backgroundColor: '#004b80' }}
       >
         Back
@@ -94,83 +96,70 @@ const ViewMoreStrayDetails = () => {
         </Col>
       </Row>
 
-      {/* <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
+      <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
         <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
           <Text><strong>Created By:</strong> {caseInfo.user.name}</Text>
         </Col>
         <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
           <Text><strong>Creator Email:</strong> {caseInfo.user.email}</Text>
         </Col>
-      </Row> */}
+      </Row>
 
-      {/* <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
+
+      <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
         <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
           <Text><strong>Creator Phone Number:</strong> {caseInfo.user.phoneNumber}</Text>
         </Col>
-        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
+        {/* <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
           <Text><strong>Reply Reports Quantity:</strong> {caseInfo.noOfReplies}</Text>
-        </Col>
-      </Row> */}
+        </Col> */}
+      </Row>
+    </Card>
 
-      {/* <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
+    <Card bodyStyle={{ padding: 0 }} hoverable style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginBottom: '20px' }}>
+      <Row>
+        <Col span={24} style={{ backgroundColor: '#004b80', padding: '10px', textAlign: 'center' }}>
+          <Title level={4} style={{ color: '#fff', margin: 0 }}>Stray Information</Title>
+        </Col>
+      </Row>
+
+      {/* //Pet Information Rows */}
+      <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
+        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
+          <Text><strong>Breed:</strong> {caseInfo.pet.breed}</Text>
+        </Col>
+        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
+          <Text><strong>Colour:</strong> {caseInfo.pet.colour}</Text>
+        </Col>
+      </Row>
+
+
+      <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
+        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
+          <Text><strong>Description:</strong> {caseInfo.pet.description}</Text>
+        </Col>
+        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
+          <Text><strong>Stray species:</strong> {caseInfo.pet.species}</Text>
+        </Col>
+      </Row>
+
+      <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
         <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
           <Text><strong>Location of Stray:</strong> {caseInfo.location}</Text>
         </Col>
         <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
           <Text><strong>District:</strong> {caseInfo.district}</Text>
         </Col>
-      </Row> */}
-    </Card>
-
-    <Card bodyStyle={{ padding: 0 }} hoverable style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', marginBottom: '20px' }}>
-      {/* <Row>
-        <Col span={24} style={{ backgroundColor: '#004b80', padding: '10px', textAlign: 'center' }}>
-          <Title level={4} style={{ color: '#fff', margin: 0 }}>Pet Information</Title>
-        </Col>
       </Row>
 
-      {/** Pet Information Rows */}
-      {/* <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
-        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
-          <Text><strong>Pet Name:</strong> {caseInfo.pet.breed}</Text>
-        </Col>
-        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
-          <Text><strong>Species:</strong> {caseInfo.pet.colour}</Text>
-        </Col>
-      </Row> */}
-
-      {/* <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
-        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
-          <Text><strong>Breed:</strong> {caseInfo.pet.species}</Text>
-        </Col>
-        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
-          <Text><strong>Color:</strong> {caseInfo.pet.color}</Text>
-        </Col>
-      </Row> */}
-
-      {/* <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
-        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
-          <Text><strong>Age (Years):</strong> {caseInfo.pet.age}</Text>
-        </Col>
-        <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
-          <Text><strong>Size (KG):</strong> {caseInfo.pet.size}</Text>
-        </Col>
-      </Row> */}
-
-      {/* <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
-        <Col span={24} style={{ padding: '0 16px' }}>
-          <Text><strong>Stray Description:</strong> {caseInfo.pet.description}</Text>
-        </Col>
-      </Row> */}
-
-      {/* <Row style={{ padding: '10px 0', alignItems: 'center' }}>
+      <Row style={{ padding: '10px 0', alignItems: 'center' }}>
         <Col xs={24} sm={6} style={{ padding: '0 16px', textAlign: 'left' }}>
           <Text><strong>Stray Image:</strong></Text>
         </Col>
         
         <Col xs={24} sm={18} style={{ padding: '0 16px', marginLeft:"-25%", textAlign: 'center' }}>
           <Image.PreviewGroup
-            items={[{ src: `data:image/png;base64,${caseInfo.pet.image}`, alt: 'Pet Image' }]}
+            items={[{ src: `data:image/png;base64,${caseInfo.pet.images}`, alt: 'Pet Image' }]}
           >
             <Image
               width={200}
@@ -180,7 +169,7 @@ const ViewMoreStrayDetails = () => {
             />
           </Image.PreviewGroup>
         </Col>
-      </Row>  */}
+      </Row> 
     </Card>
     
   </div>

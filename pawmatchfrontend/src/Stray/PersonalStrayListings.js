@@ -20,7 +20,7 @@ const PersonalStrayListings = () => {
         setLoading(true); 
         try {
             const response = await axios.post('http://localhost:8000/api/getAllStrayReportsByUserID', {
-                userID: 2 //later must use localStorage.
+                userID: 1 //later must use localStorage.
             });
             setData(response.data.data); 
         } catch (error) {

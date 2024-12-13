@@ -4,6 +4,7 @@ import { Layout, Form, Input, Button, Upload, Col, Row, Typography, message, Mod
 import { PlusOutlined } from '@ant-design/icons';
 import FooterBar from '../GeneralComponents/FooterBar';
 import Sidebar from '../GeneralComponents/SideBar';
+import { useNavigate } from 'react-router-dom';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -15,6 +16,7 @@ function AddDonation() {
   const [fileList, setFileList] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
@@ -39,6 +41,7 @@ function AddDonation() {
         },
       });
       message.success('Donation details submitted successfully');
+      navigate('/ViewMyDonation');
     } catch (error) {
       console.error('Submission error:', error);
       message.error('Failed to submit donation details');
@@ -147,8 +150,11 @@ function AddDonation() {
               </Row>
 
               <Form.Item style={{ textAlign: 'center', marginTop: '20px' }}>
-                <Button type="primary" htmlType="submit" loading={loading}>
+                <Button type="primary" htmlType="submit" loading={loading} style={{ marginRight: '10px' }}>
                   Submit
+                </Button>
+                <Button type="default" onClick={() => navigate('/ViewMyDonation')}>
+                  Back
                 </Button>
               </Form.Item>
             </Form>
