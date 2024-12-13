@@ -398,7 +398,7 @@ const EditAdoption = () => {
                                             rules={[{ required: true, message: 'Please input your pet\'s age!' }]}
                                             initialValue={initialAge.value}
                                         >
-                                            <InputNumber min={0} style={{ width: '70%' }} />
+                                            <InputNumber min={1} style={{ width: '70%' }} />
                                         </Form.Item>
                                         <Form.Item
                                             name="ageSuffix"
@@ -438,7 +438,7 @@ const EditAdoption = () => {
                         <Row gutter={16}>
                             <Col span={12}>
                                 <Form.Item name="weight" label="Weight" rules={[{ required: true, message: 'Please input your pet\'s weight!' }]}>
-                                    <InputNumber min={0} max={100} step={0.1} addonAfter="Kg" />
+                                    <InputNumber min={0.01} max={200} step={0.01} addonAfter="Kg" />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>

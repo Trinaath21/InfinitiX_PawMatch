@@ -372,7 +372,9 @@ function AddAdoption() {
                             <Col xs={24} sm={12}>
                                 <Form.Item label="Age" name="age" rules={[{ required: true, message: 'Please input your pet\'s age!' }]}>
                                     <InputNumber
+                                        placeholder="State the age of your pet"
                                         value={formData.age}
+                                        min={1}
                                         onChange={(value) => handleSelectChange(value, 'age')}
                                         addonAfter={
                                             <Select value={formData.ageUnit} onChange={(value) => handleSelectChange(value, 'ageUnit')}>
@@ -405,7 +407,7 @@ function AddAdoption() {
 
                             <Col xs={24} sm={12}>
                                 <Form.Item label="Weight" name="weight" rules={[{ required: true, message: 'Please input your pet\'s weight!' }]}>
-                                    <InputNumber value={formData.weight} onChange={(value) => handleSelectChange(value, 'weight')} addonAfter="Kg" style={{ width: '100%' }} />
+                                    <InputNumber placeholder="State the weight of your pet" value={formData.weight} min={0.01} onChange={(value) => handleSelectChange(value, 'weight')} addonAfter="Kg" step={0.01} style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
                             <Col xs={24} sm={12}>
@@ -446,7 +448,7 @@ function AddAdoption() {
 
                             <Col xs={24} sm={12}>
                                 <Form.Item label="Adoption Fee (if any)" name="adoptionFee">
-                                    <InputNumber value={formData.adoptionFee} onChange={(value) => handleSelectChange(value, 'adoptionFee')} addonBefore="RM" min={0} step={0.01} style={{ width: '100%' }} />
+                                    <InputNumber placeholder="State the adoption fee (if any)" value={formData.adoptionFee} onChange={(value) => handleSelectChange(value, 'adoptionFee')} addonBefore="RM" min={0} step={0.01} style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
                         </Row>

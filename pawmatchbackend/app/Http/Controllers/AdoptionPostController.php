@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PetAdoptionPost;
+use App\Models\AdoptionApplication;
 use Illuminate\Support\Facades\Storage;
 
 class AdoptionPostController extends Controller
@@ -208,6 +209,39 @@ class AdoptionPostController extends Controller
 
         return response()->json($posts, 200);
     }
+
+    public function getPostsAndApplications(Request $request)
+{
+    $id = $request->query('id');
+
+    if (!$id) {
+        return response()->json([
+            'error' => 'id query parameter is required.'
+        ], 400);
+    }
+
+    // Fetch posts based on user ID
+    $posts = PetAdoptionPost::where('id', $id)->get();
+
+    // Process each post to handle the pet image
+    $posts = $posts->map(function ($post) {
+        if ($post->petImage) {
+            $mimeType = finfo_buffer(finfo_open(), $post->petImage, FILEINFO_MIME_TYPE);
+            $post->petImage = 'data:' . $mimeType . ';base64,' . base64_encode($post->petImage);
+        }
+        return $post;
+    });
+
+    // Fetch adoption applications based on user ID
+    $applications = AdoptionApplication::where('user_id', $id)->get();
+
+    // Combine both datasets and send as a single response
+    return response()->json([
+        'posts' => $posts,
+        'applications' => $applications,
+    ], 200);
+}
+
 
     public function deleteAdoptionPost(Request $request)
     {

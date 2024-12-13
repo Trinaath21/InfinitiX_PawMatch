@@ -14,63 +14,61 @@ const ViewPublicListing = () => {
     const [searchKeyword, setSearchKeyword] = useState('');
     const [dateRange, setDateRange] = useState([null, null]);
     const [page, setPage] = useState(1);
-    const [pets, setPets] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [postData, setPostData] = useState([]);
+    const [appliedPostIds, setAppliedPostIds] = useState([]); // Store IDs of posts the user applied for
     const [districtOptions, setDistrictOptions] = useState([]);
     const [speciesOptions, setSpeciesOptions] = useState([]);
-    const id = 21;
+    const [loading, setLoading] = useState(true);
+    const id = 21; // Replace with the actual user_id
     const itemsPerPage = 6;
-    useEffect(() => {
-        // Define the function to fetch data
-        const fetchPostData = async () => {
-            try {
 
-                const response = await axios.get(`http://localhost:8000/api/adoption-posts?id=${id}`);
-                console.log("post_data", response.data);
-                setPostData(response.data);
-                const uniqueDistricts = [...new Set(response.data.map((post) => post.district))];
-                const uniqueSpecies = [...new Set(response.data.map((post) => post.species))];
+    useEffect(() => {
+        // Fetch combined data (posts and applications)
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:8000/api/get-posts-and-applications?id=${id}`);
+                console.log('Combined Data:', response.data);
+
+                // Extract posts and applications from the response
+                const { posts, applications } = response.data;
+
+                // Store post data
+                setPostData(posts);
+
+                // Extract adoption_post_id from applications and store
+                const appliedIds = applications.map(app => app.adoption_post_id);
+                setAppliedPostIds(appliedIds);
+
+                // Extract unique district and species options
+                const uniqueDistricts = [...new Set(posts.map(post => post.district))];
+                const uniqueSpecies = [...new Set(posts.map(post => post.species))];
                 setDistrictOptions(uniqueDistricts);
                 setSpeciesOptions(uniqueSpecies);
+
                 setLoading(false);
             } catch (error) {
-                console.error("Error fetching post data:", error);
+                console.error('Error fetching data:', error);
             }
         };
 
-        fetchPostData();
+        fetchData();
     }, []);
 
-    // useEffect(() => {
-    //   const fetchPetImages = async () => {
-    //     const petsWithImages = await Promise.all(
-    //       petData.map(async (pet) => {
-    //         const response = await axios.get('https://dog.ceo/api/breeds/image/random');
-    //         return { ...pet, image: response.data.message };
-    //       })
-    //     );
-    //     setPets(petsWithImages);
-    //     setLoading(false);
-    //   };
-
-    //   fetchPetImages();
-    // }, []);
-
-    const filteredPosts = postData.filter((post) => {
+    // Filter posts based on conditions
+    const filteredPosts = postData.filter(post => {
         const matchesDistrict = district ? post.district === district : true;
         const matchesSpecies = species ? post.species === species : true;
         const matchesKeyword = searchKeyword
             ? post.name.toLowerCase().includes(searchKeyword.toLowerCase()) || post.breed.toLowerCase().includes(searchKeyword.toLowerCase())
             : true;
-
         const matchesDateRange = dateRange[0] && dateRange[1]
-            ? moment(post.created_at).isBetween(dateRange[0].format("YYYY-MM-DD"), dateRange[1].format("YYYY-MM-DD"), 'day', '[]')
+            ? moment(post.created_at).isBetween(dateRange[0].format('YYYY-MM-DD'), dateRange[1].format('YYYY-MM-DD'), 'day', '[]')
             : true;
+        const notApplied = !appliedPostIds.includes(post.adoption_post_id); // Exclude applied posts
+        console.log(`Post ${post.adoption_post_id}: notApplied = ${notApplied}`);
 
-        return matchesDistrict && matchesSpecies && matchesKeyword && matchesDateRange;
+        return matchesDistrict && matchesSpecies && matchesKeyword && matchesDateRange && notApplied;
     });
-
 
     const indexOfLastItem = page * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -79,7 +77,7 @@ const ViewPublicListing = () => {
     const handleApply = (adoption_post_id) => {
         console.log("Viewing details for post id:", adoption_post_id);
         navigate('/applyAdoption', { state: { adoption_post_id: adoption_post_id } });
-      };
+    };
 
     const handlePageChange = (page) => {
         setPage(page);
@@ -91,7 +89,7 @@ const ViewPublicListing = () => {
     //   };
     const handleCardClick = (adoption_post_id) => {
         console.log("Viewing details for post id:", adoption_post_id);
-        navigate('/ViewMoreAdoption', { state: { adoption_post_id: adoption_post_id, page:"/ViewPublicListing" } });
+        navigate('/ViewMoreAdoption', { state: { adoption_post_id: adoption_post_id, page: "/ViewPublicListing" } });
     };
 
     return (
@@ -116,7 +114,7 @@ const ViewPublicListing = () => {
                         placeholder="Select Species"
                         style={{ width: '100%' }}
                         value={species}
-                        onChange={(value) => setSpecies(value)}
+                        onChange={(value) => setDistrict(value)}
                     >
                         <Option value="">All Species</Option>
                         {speciesOptions.map((species, index) => (
@@ -128,7 +126,7 @@ const ViewPublicListing = () => {
                 <Col xs={24} sm={12} md={8} lg={6}>
                     <RangePicker
                         style={{ width: '100%' }}
-                        onChange={(dates) => setDateRange(dates ? [dates[0], dates[1]] : [null, null])}
+                        onChange={dates => setDateRange(dates ? [dates[0], dates[1]] : [null, null])}
                     />
                 </Col>
 
@@ -136,7 +134,7 @@ const ViewPublicListing = () => {
                     <Input
                         placeholder="Search by Name or Breed"
                         value={searchKeyword}
-                        onChange={(e) => setSearchKeyword(e.target.value)}
+                        onChange={e => setSearchKeyword(e.target.value)}
                     />
                 </Col>
             </Row>
@@ -152,14 +150,12 @@ const ViewPublicListing = () => {
             ) : (
                 <>
                     <Row gutter={[16, 16]}>
-                        {currentPosts.map((post) => (
+                        {currentPosts.map(post => (
                             <Col xs={24} sm={12} md={8} lg={8} key={post.adoption_post_id}>
                                 <Tooltip title="Click to view more">
                                     <Card
                                         cover={
                                             <img
-                                                //alt={post.name} 
-                                                //src={`data:image/jpeg;base64,${post.petImage}`} 
                                                 src={post.petImage}
                                                 alt="Pet image"
                                                 style={{ objectFit: 'cover', height: 300, width: '100%' }}
@@ -177,9 +173,9 @@ const ViewPublicListing = () => {
                                             cursor: 'pointer',
                                         }}
                                         hoverable
-                                        onClick={() => handleCardClick(post.adoption_post_id)}  // Pass the specific adoption_post_id
-                                        onMouseEnter={(e) => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 153, 255, 0.6)')}
-                                        onMouseLeave={(e) => (e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)')}
+                                        onClick={() => handleCardClick(post.adoption_post_id)}
+                                        onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 153, 255, 0.6)')}
+                                        onMouseLeave={e => (e.currentTarget.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)')}
                                     >
                                         <Card.Meta
                                             title={
@@ -223,7 +219,7 @@ const ViewPublicListing = () => {
                                                                 handleApply(post.adoption_post_id);
                                                             }}
                                                             //navigate('/ViewMoreAdoption', { state: { adoption_post_id: adoption_post_id } });
-                                                            type="default" 
+                                                            type="default"
                                                             style={{
                                                                 backgroundColor: post.status === 'available' ? '#ecffe3' : '',
                                                                 color: post.status === 'available' ? '#52c41a' : '#d9d9d9',
@@ -237,14 +233,7 @@ const ViewPublicListing = () => {
                                                 </div>
                                             }
                                         />
-                                        {/* <Typography.Text ellipsis style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            Created at: {post.created_at}
-                                        </Typography.Text>
-                                        <Typography.Text ellipsis style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                            Gender: {post.gender}
-                                        </Typography.Text> */}
                                     </Card>
-
                                 </Tooltip>
                             </Col>
                         ))}

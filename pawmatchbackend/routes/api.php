@@ -66,8 +66,10 @@ Route::get('/adoption-posts/{adoption_post_id}', [AdoptionPostController::class,
 Route::post('/adoption-posts/{adoption_post_id}', [AdoptionPostController::class, 'update']);
 Route::get('/adoption-posts', [AdoptionPostController::class, 'getPostsByUser']);
 Route::get('/get-public-adoption-posts', [AdoptionPostController::class, 'getPostsByUserPublic']);
+Route::get('/get-posts-and-applications', [AdoptionPostController::class, 'getPostsAndApplications']);
 Route::post('/getSpecificPost', [AdoptionPostController::class, 'viewMore']);
 Route::post('/deleteAdoptionPost', [AdoptionPostController::class, 'deleteAdoptionPost']);
+Route::get('/member-address', [AdoptionApplicationController::class, 'getAddressByUserId']);
 Route::post('/apply-adoption', [AdoptionApplicationController::class, 'store']);
 
 //login register module
