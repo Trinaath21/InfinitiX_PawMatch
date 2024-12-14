@@ -1,7 +1,7 @@
 // ContentArea.js
 import React from 'react';
 import { Layout, theme } from 'antd';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 //lostFound
 import PersonalListing from '../LostFoundReport/PersonalListing';
 import ViewMoreDetails from '../LostFoundReport/ViewMoreDetails'; // Import the ViewMoreDetails component
@@ -23,9 +23,20 @@ import ViewMyDonation from '../Donation/ViewMyDonation';
 import PublicStrayListings from '../Stray/PublicStrayListings';
 import PersonalStrayListings from '../Stray/PersonalStrayListings';
 import ViewMoreStrayDetails from '../Stray/ViewMoreStrayDetails';
+
 //Forum
-import ContentComponent from './Forum/ForumPostComponent'; 
-import PostDetails from './Forum/PostDetails';
+import PostDetails from '../Forum/PostDetails.js';
+import ContentComponent from '../Forum/ForumPostComponent.js';
+import Login from '../Pages/Login/index.js';
+import Register from '../Pages/Register/index.js';
+import ForgotPassword from '../Pages/Password/forgetpassword.js';
+import ResetPassword from '../Pages/Password/resetpassword.js';
+import Main from '../Pages/main.js';
+import Home from '../Pages/Home/index.js';
+import MemberProfile from '../Pages/Profiles/MemberProfile.js';
+import EditMemberProfile from '../Pages/Profiles/EditMemberProfile.js';
+import ShelterProfile from '../Pages/Profiles/ShelterProfile.js';
+import EditShelterProfile from '../Pages/Profiles/EditShelterProfile.js';
 
 const { Content } = Layout;
 
@@ -45,6 +56,20 @@ const ContentArea = () => {
       }}
     >
       <Routes>
+      <Route path="/" element={<Navigate to="/landing" replace />} />
+      <Route path="/landing" element={<Navigate to="/landing" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forget-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/main" element={<Main />}/>
+      <Route path="home" element={<Home />} />
+      <Route path="profiles/member" element={<MemberProfile />} />
+      <Route path="profiles/member/edit" element={<EditMemberProfile />} />
+      <Route path="profiles/shelter" element={<ShelterProfile />} />
+      <Route path="profiles/shelter/edit" element={<EditShelterProfile />} />
+
+        
         //lostFound
         <Route path="/" element={<PublicLostPetListings />} /> 
         <Route path="/publicLostReportList" element={<PublicLostPetListings />} /> 
@@ -75,7 +100,7 @@ const ContentArea = () => {
         <Route path="/PersonalStrayListings" element={<PersonalStrayListings/>} />
 
         //Forum
-       <Route path="/forum" element={<ContentComponent />} />
+       <Route path="/forum" element={<ContentComponent/>} />
        <Route path="/post/:post_id" element={<PostDetails />} />
   
       </Routes>

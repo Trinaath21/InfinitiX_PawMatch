@@ -26,13 +26,15 @@ function getItem(label, key, icon, onClick, children) {
   };
 }
 
-const Sidebar = ({ collapsed, toggleCollapse, userRole }) => {
+const Sidebar = ({ collapsed, toggleCollapse }) => {
   const navigate = useNavigate(); // Initialize useNavigate
-
+  //guest, member, shelter -- role
+  const userRole = 1;
   const items = [
     getItem('Home', '1', <HomeOutlined />, () => navigate('/')),
     userRole !== 2 && getItem('Lost & Found', 'sub1', <PieChartOutlined />, null, [
       getItem('Public Listing', '2-1', null, () => navigate('/publicLostReportList')),
+      
       getItem('Personal Listing', '2-2', null, () => navigate('/personalReportlisting')),
     ]),
     getItem('Adoption', 'sub2', <HeartOutlined />, null, [
