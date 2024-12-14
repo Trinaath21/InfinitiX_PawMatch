@@ -6,7 +6,8 @@ html {
 }
 
 .landing-page {
-  background: url("C:/xampp/htdocs/pawmatch/frontend/src/images/bg-landing.jpg")
+  
+  background: url("../../images/bg-landing.jpg")
     no-repeat center center fixed;
   background-size: cover;
   height: 100vh;

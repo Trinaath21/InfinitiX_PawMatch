@@ -32,8 +32,6 @@ const LandingPage = () => {
           Continue as Guest
         </button>
       </div>
-
-      <FooterBar />
     </div>
   );
 };

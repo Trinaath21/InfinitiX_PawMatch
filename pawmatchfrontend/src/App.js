@@ -17,13 +17,7 @@ const App = () => {
   return (
     <Router>
       <Layout style={{ minHeight: '100vh' }}>
-        <Sidebar collapsed={collapsed} toggleCollapse={toggleCollapse} userRole={1} />
-
-        <Layout>
-          <ContentArea />
-          
-          <FooterBar />
-        </Layout>
+      <ContentArea ></ContentArea>
       </Layout>
     </Router>
   );

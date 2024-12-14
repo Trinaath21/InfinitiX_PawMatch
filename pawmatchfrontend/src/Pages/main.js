@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Layout, Button } from "antd";
 import { MenuUnfoldOutlined, MenuFoldOutlined } from "@ant-design/icons";
-import Sidebar from "../GeneralComponents/sidebar";
+import SideBar from "../GeneralComponents/SideBar";
 import FooterBar from "../GeneralComponents/FooterBar";
 import logo from "../images/PawMatchLogo.png";
 
@@ -18,7 +18,7 @@ const Main = () => {
 
   return (
     <Layout className="main-container">
-      <Sidebar collapsed={collapsed} />
+      <SideBar collapsed={collapsed} />
       <Layout>
         <Header
           style={{

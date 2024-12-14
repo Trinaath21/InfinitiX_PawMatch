@@ -52,7 +52,7 @@ button:hover {
 }
 
 .banner {
-  background: url("C:\xampp\htdocs\pawmatch\frontend\src\images\HOME-PAGE.JPG")
+  background: url("../../images/HOME-PAGE.JPG")
     no-repeat center center/cover;
   height: 600px;
   display: flex;
