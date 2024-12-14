@@ -8,9 +8,9 @@ import AddReplyReport from './AddReplyReport';
 const ViewMoreDetails = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigate = useNavigate();
-  const role = parseInt(localStorage.getItem('role'), 10);
+  const role = localStorage.getItem('role');
   const [isBackVisible, setIsBackVisible] = useState(true);
-  const userID = role === 'guest' ? 9999999 : parseInt(localStorage.getItem('userID'), 10);
+  const userID = role === 'guest' ? 9999999 : parseInt(localStorage.getItem('user_id'), 10);
   // let userID = 3;
   const [loading, setLoading] = useState(true);
   const { Title, Text } = Typography;

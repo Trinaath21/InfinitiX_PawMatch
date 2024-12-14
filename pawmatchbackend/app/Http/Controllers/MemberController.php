@@ -47,7 +47,7 @@ class MemberController extends Controller
             'NoOfPets' => $request->NoOfPets,
             'phone_number' => $request->phone_number,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => $request->password,
             'profile_picture' => $request->profile_picture
         ]);
 
@@ -86,9 +86,10 @@ class MemberController extends Controller
         }
 
         // 验证密码
-        if (!Hash::check($request->password, $member->password)) {
+        if ($request->password !== $member->password) {
             return response()->json(['message' => 'Invalid password'], 401);
         }
+        
 
         // 创建登录 token
         $token = $member->createToken('login-token')->plainTextToken;

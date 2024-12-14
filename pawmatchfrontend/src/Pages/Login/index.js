@@ -104,7 +104,7 @@ const Login = () => {
         localStorage.setItem("role", role);
         // Store the role
 
-        navigate("/main/home");
+        navigate("/home");
       }
     } catch (err) {
       if (err.response) {
@@ -199,13 +199,6 @@ const Login = () => {
           <Form.Item>
             <div className="form-footer">
               <Checkbox>Remember me</Checkbox>
-              <a
-                className="forget-password"
-                onClick={() => navigate("/forget-password")}
-                style={{ cursor: "pointer", color: "#1890ff" }}
-              >
-                Forgot password?
-              </a>
             </div>
           </Form.Item>
 

@@ -5,6 +5,10 @@ body {
   color: #333;
 }
 
+.home{
+  height:100%;
+}
+
 a {
   text-decoration: none;
   color: inherit;
@@ -54,7 +58,7 @@ button:hover {
 .banner {
   background: url("../../images/HOME-PAGE.JPG")
     no-repeat center center/cover;
-  height: 600px;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

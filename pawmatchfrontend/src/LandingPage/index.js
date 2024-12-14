@@ -24,14 +24,15 @@ const LandingPage = () => {
       <div className="content">
         <h1 className="title">Paw Match</h1>
         <br></br>
-        <p className="subtitle">From Stray to Stay: Your Companion Awaits.</p>
-        <br></br>
-        <p className="email-text">Find Your Perfect Match, One Paw at a Time</p>
+        <p className="subtitle">Where Compassion Meets Opportunity.</p>        <br></br>
+        <p className="email-text">Discover Companionship, Connection, and Care.</p>
+
         <br></br>
         <button className="blue-button" onClick={() => navigate("/home")}>
           Continue as Guest
         </button>
       </div>
+      <FooterBar />
     </div>
   );
 };

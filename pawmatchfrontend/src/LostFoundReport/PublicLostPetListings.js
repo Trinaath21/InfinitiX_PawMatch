@@ -17,14 +17,16 @@ const PublicLostPetListings = () => {
   const [loading, setLoading] = useState(true);
   const[reportData,setReportData] = useState([]);
   const [districtOptions, setDistrictOptions] = useState([]);
-
+  const role = localStorage.getItem('role');
+  const userID =
+    role === "guest" ? 9999999 : parseInt(localStorage.getItem("user_id"), 10);
   const itemsPerPage = 6;
   useEffect(() => {
     // Define the function to fetch data
     const fetchReportData = async () => {
       try {
         const response = await axios.post('http://localhost:8000/api/getAllReports',{
-          userID: 3 //later must use localStorage.
+          userID: userID //later must use localStorage.
       }); 
         console.log("report_data",response.data);
         setReportData(response.data.data);

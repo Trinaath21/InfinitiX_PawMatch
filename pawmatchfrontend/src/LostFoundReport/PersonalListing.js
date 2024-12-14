@@ -14,7 +14,7 @@ const PersonalListing = () => {
     const [loading, setLoading] = useState(false);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [selectedReport, setSelectedReport] = useState(null);
-    const userID = parseInt(localStorage.getItem('userID'), 10);
+    const userID = parseInt(localStorage.getItem('user_id'), 10);
     const refreshTableData = async () => {
         setLoading(true); 
         try {

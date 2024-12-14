@@ -1,4 +1,5 @@
 import React, { useState, useRef, useMemo, useCallback,useEffect } from 'react';
+import { useLocation, useNavigate,useParams  } from 'react-router-dom';
 import { Modal, Form, Input, Select, DatePicker, Upload, Button, Row, Col, Image,InputNumber, message  } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { useFormik } from 'formik';
@@ -124,13 +125,14 @@ const LocationPicker = ({ onLocationChange, formik }) => {
     );
 };
 const AddReplyReport = ({ visible, onClose,report_id }) => {
+      const navigate = useNavigate();
     const [previewOpen, setPreviewOpen] = useState(false);
     const [userData, setUserData] = useState(null);
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
     const [location, setLocation] = useState(null);
-    const role = parseInt(localStorage.getItem('role'), 10);
-    const userID = role === 'guest' ? 9999999 : parseInt(localStorage.getItem('userID'), 10);
+    const role = localStorage.getItem('role');
+    const userID = role === 'guest' ? 9999999 : parseInt(localStorage.getItem('user_id'), 10);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -162,7 +164,7 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
         enableReinitialize: true, // Ensure form values reinitialize with fetched data
         initialValues: {
             name: userData?.name || '',
-            phoneNumber: userData?.phoneNumber || '',
+            phoneNumber: userData?.phone_number || '',
             email: userData?.email || '',
             detailed_address: userData?.detailed_address || '',
             location: '',
@@ -242,7 +244,7 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
                     image: [],
                 });
                 onClose(false);
-                //navigate to PublicLostPetListingPage
+                navigate("/publicLostReportList")
             } catch (error) {
                 console.error('There was an error!', error);
                 message.error('Failed to submit reply report.');

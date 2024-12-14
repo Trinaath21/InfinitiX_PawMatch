@@ -7,14 +7,6 @@ import FooterBar from "../../GeneralComponents/FooterBar";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const handleContinueAsGuest = () => {
-    // Store 'role' as 'guest' in localStorage
-    localStorage.setItem("role", "guest");
-    console.log("Stored Role as Guest:", localStorage.getItem("role"));
-
-    // Navigate to the guest home page or wherever you'd like
-    navigate("/main/home");
-  };
 
   return (
     <div className="landing-page">
@@ -29,25 +21,23 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <div className="content">
-        <h1 className="title">Paw Match</h1>
-        <br></br>
-        <p className="subtitle">From Stray to Stay: Your Companion Awaits.</p>
-        <br></br>
-        <p className="email-text">Find Your Perfect Match, One Paw at a Time</p>
-        <br></br>
+      <div className="container">
+      <div className="card">
+        <h1 className="title">PawMatch</h1>
+        <p className="subtitle">Where Compassion Meets Opportunity.</p>
+        <p className="email-text">Discover Companionship, Connection, and Care.</p>
         <button
           className="blue-button"
           onClick={() => {
             localStorage.setItem("role", "guest"); // Set role first
-            navigate("/main/home"); // Then navigate
+            navigate("/home"); // Then navigate
           }}
         >
           Continue as Guest
         </button>
       </div>
-
-      <FooterBar />
+    </div>
+<FooterBar />
     </div>
   );
 };

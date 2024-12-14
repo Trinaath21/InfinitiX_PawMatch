@@ -183,7 +183,7 @@ const AddNewReport = ({ visible, onClose,refreshTableData }) => {
                 ),
         }),
         onSubmit: async (values) => {
-            const userID = parseInt(localStorage.getItem('userID'), 10);
+            const userID = parseInt(localStorage.getItem('user_id'), 10);
             const formData = new FormData();
             formData.append('user_id', userID); // Assuming you have user_id, replace with actual value
             formData.append('name', values.name);
