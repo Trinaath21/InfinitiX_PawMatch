@@ -32,6 +32,11 @@ class ShelterProfileController extends Controller
                 'profile_picture' => $shelter->profile_picture, 
                 'website_url' => $shelter->website_url,
                 'description' => $shelter->description,
+                //新加入
+                 'representative_name' => $shelter->profile->representative_name,
+                 'username' => $shelter->profile->username,
+                 'contact_number' => $shelter->profile->contact_number,
+              //
             ]
         ], 200);
     }
@@ -49,8 +54,8 @@ class ShelterProfileController extends Controller
         // 验证请求数据
         
         $validated = $request->validate([
-            'shelter_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:shelters,email,' . $shelter->id,
+            //'shelter_name' => 'required|string|max:255',
+            //'email' => 'required|email|unique:shelters,email,' . $shelter->id,
             'state' => 'required|string|max:255',
             'district' => 'required|string|max:255',
             'detailed_address' => 'required|string|max:255',
@@ -59,44 +64,58 @@ class ShelterProfileController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'website_url' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
+
+          'representative_name' => 'nullable|string|max:255',
+          'username' => 'nullable|string|max:255',
+          'contact_number' => 'nullable|string|max:15',
         ]);
         
-        // 处理文件上传：如果有新的 profile_picture，保存它
         if ($request->hasFile('profile_picture')) {
-            // 删除旧的图片文件（如果存在）
+      
             if ($shelter->profile_picture) {
                 Storage::delete('public/' . $shelter->profile_picture);
             }
-            // 存储新图片
+   
             $validated['profile_picture'] = $request->file('profile_picture')->store('profile_pictures', 'public');
         }
 
-        // 更新 Shelter 数据
         $shelter->update($validated);
 
-        // 如果有 profile 数据，也更新它
         $profile = $shelter->profile; 
         if ($profile) {
             $profile->update([
                 'profile_picture' => $validated['profile_picture'] ?? $profile->profile_picture,
-                'website_url' => $request->website_url,
-                'description' => $request->description,
+                'website_url' => $shelter->website_url,
+                'description' => $shelter->description,
+                'state' => $shelter->state,
+                'district' => $shelter->district,
+                'detailed_address' => $shelter->detailed_address,
+                'phone_number' => $shelter->phone_number,
+                'NoOfPets' => $shelter->NoOfPets, 
+              'representative_name' => $request->representative_name,
+              'username' => $request->username,
+              'contact_number' => $request->contact_number,
             ]);
         } else {
-            // 如果没有 profile，则创建一个新的
             ShelterProfile::create([
                 'shelter_id' => $shelter->id,
                 'profile_picture' => $validated['profile_picture'] ?? null,
                 'website_url' => $request->website_url,
                 'description' => $request->description,
+                'representative_name' => $request->shelter_profiles->representative_name, 
+                'username' => $request->shelter_profiles->username,
+                'contact_number' => $request->shelter_profiles->contact_number,
             ]);
         }
 
         return response()->json([
             'message' => 'Shelter profile updated successfully',
             'data' => $shelter,
+        
         ], 200);
     }
 }
+
+
 
 

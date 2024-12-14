@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
-  Input,
-  Button,
   Form,
-  Spin,
-  message,
+  Input,
   InputNumber,
   Cascader,
+  Button,
+  Spin,
+  message,
+  Select,
 } from "antd";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const stateDistrictData = [
   {
@@ -178,15 +179,20 @@ const stateDistrictData = [
     children: [{ value: "Federal Territory", label: "Federal Territory" }],
   },
 ];
-
 const EditShelterProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const prefixSelector = (
+    <Select defaultValue="06" style={{ width: 70 }}>
+      <Select.Option value="06">06</Select.Option>
+      <Select.Option value="86">86</Select.Option>
+    </Select>
+  );
 
   const authToken = localStorage.getItem("ShelterLoginToken");
-
+  // Fetch shelter profile data
   useEffect(() => {
     if (authToken) {
       axios
@@ -209,16 +215,17 @@ const EditShelterProfile = () => {
     }
   }, [authToken]);
 
+  // Handle form submission
   const handleSubmit = (values) => {
     setLoading(true);
-    const [state, district] = values.state_district || [];
 
+    const [state, district] = values.state_district || [];
     const updatedValues = {
       ...values,
       state,
       district,
     };
-    delete updatedValues.state_district;
+    delete updatedValues.state_district; // Remove temporary field
 
     axios
       .put("http://localhost:8000/api/updateShelterProfile", updatedValues, {
@@ -228,104 +235,142 @@ const EditShelterProfile = () => {
       })
       .then((response) => {
         message.success("Shelter profile updated successfully!");
-        setProfile(response.data.profile);
         navigate("/main/profiles/shelter");
       })
       .catch((err) => {
-        message.error("Failed to update shelter profile");
+        message.error(
+          err.response?.data?.message || "Failed to update shelter profile"
+        );
         setLoading(false);
-        console.error(err.response ? err.response.data : err); // Log the error for debugging
       });
   };
 
-  return (
-    <div style={{ padding: "20px" }}>
-      {error && <p className="error">{error}</p>}
-      {loading ? (
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
         <Spin size="large" />
-      ) : profile ? (
-        <Form
-          layout="vertical"
-          initialValues={{
-            shelter_name: profile.shelter_name,
-            phone_number: profile.phone_number,
-            state_district: [profile.state, profile.district],
-            district: profile.district,
-            detailed_address: profile.detailed_address,
-            NoOfPets: profile.NoOfPets,
-            website_url: profile.website_url,
-            description: profile.description,
-          }}
-          onFinish={handleSubmit}
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <p className="error">{error}</p>
+        <Button type="primary" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: "20px", maxWidth: 800, margin: "auto" }}>
+      <Form
+        layout="vertical"
+        initialValues={{
+          representative_name: profile.representative_name,
+          username: profile.username,
+          phone_number: profile.phone_number,
+          state_district: [profile.state, profile.district],
+          detailed_address: profile.detailed_address,
+          NoOfPets: profile.NoOfPets,
+          website_url: profile.website_url,
+          description: profile.description,
+          contact_number: profile.contact_number,
+        }}
+        onFinish={handleSubmit}
+      >
+        <Form.Item label="Representative Name" name="representative_name">
+          <Input placeholder="Enter representative name" />
+        </Form.Item>
+
+        <Form.Item label="Username" name="username">
+          <Input placeholder="Enter username" />
+        </Form.Item>
+
+        <Form.Item
+          label="Phone Number"
+          name="phone_number"
+          rules={[
+            { required: false, message: "Please input your phone number!" },
+            {
+              pattern: /^\d{6,}$/,
+              message: "Phone number must be at least 6 digits.",
+            },
+          ]}
         >
-          <Form.Item
-            label="Shelter Name"
-            name="shelter_name"
-            rules={[{ required: true, message: "Please input shelter name!" }]}
-          >
-            <Input />
-          </Form.Item>
+          <Input addonBefore={prefixSelector} />
+        </Form.Item>
 
-          <Form.Item label="Phone Number" name="phone_number">
-            <Input />
-          </Form.Item>
+        <Form.Item
+          name="state_district"
+          label="State and District"
+          rules={[
+            {
+              required: false,
+              message: "Please select the state and district!",
+            },
+          ]}
+        >
+          <Cascader options={stateDistrictData} placeholder="Please select" />
+        </Form.Item>
 
-          <Form.Item
-            name="state_district"
-            label="State and District"
-            rules={[
-              {
-                required: true,
-                message: "Please select the state and district!",
-              },
-            ]}
-          >
-            <Cascader options={stateDistrictData} placeholder="Please select" />
-          </Form.Item>
+        <Form.Item
+          name="detailed_address"
+          label="Detailed Address"
+          rules={[
+            { required: false, message: "Please input detailed address!" },
+          ]}
+        >
+          <Input />
+        </Form.Item>
 
-          <Form.Item
-            name="detailed_address"
-            label="Detailed Address"
-            rules={[
-              { required: true, message: "Please input detailed address!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+        <Form.Item
+          name="NoOfPets"
+          label="Number of Pets"
+          rules={[{ required: false, message: "Please input number of pets!" }]}
+        >
+          <InputNumber min={0} style={{ width: "100%" }} />
+        </Form.Item>
+        <Form.Item
+          name="website_url"
+          label="Website URL"
+          rules={[
+            {
+              type: "url",
+              message: "Please enter a valid URL (e.g., https://example.com).",
+            },
+            {
+              required: false,
+              message: "Website URL is required.",
+            },
+          ]}
+        >
+          <Input placeholder="Enter your website URL" />
+        </Form.Item>
 
-          <Form.Item
-            name="NoOfPets"
-            label="Number of Pets"
-            rules={[
-              { required: true, message: "Please input number of pets!" },
-            ]}
-          >
-            <InputNumber min={0} style={{ width: "100%" }} />
-          </Form.Item>
+        <Form.Item name="description" label="Description">
+          <Input.TextArea rows={4} />
+        </Form.Item>
 
-          <Form.Item name="website_url" label="Website URL">
-            <Input />
-          </Form.Item>
-
-          <Form.Item name="description" label="Description">
-            <Input.TextArea />
-          </Form.Item>
-
-          <div style={{ textAlign: "center" }}>
-            <Button type="primary" htmlType="submit">
-              Save Changes
-            </Button>
-            <Button
-              type="primary"
-              onClick={() => navigate("/main/profiles/shelter")}
-            >
-              Back
-            </Button>
-          </div>
-        </Form>
-      ) : (
-        <p>No shelter profile found</p>
-      )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: "10px",
+          }}
+        >
+          <Button type="primary" htmlType="submit">
+            Save Changes
+          </Button>
+          <Button onClick={() => navigate("/main/profiles/shelter")}>
+            Cancel
+          </Button>
+        </div>
+      </Form>
     </div>
   );
 };

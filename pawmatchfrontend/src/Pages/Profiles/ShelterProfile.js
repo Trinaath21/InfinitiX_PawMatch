@@ -53,6 +53,8 @@ const ShelterProfile = () => {
     profile_picture,
     website_url,
     description,
+    representative_name,
+    username,
   } = profile;
 
   return (
@@ -61,7 +63,7 @@ const ShelterProfile = () => {
         <div style={{ textAlign: "center" }}>
           <img
             src={`http://localhost:8000/storage/${
-              profile_picture || "placeholder.jpg"
+              profile_picture || "profile-cover.jpg"
             }`}
             alt="Profile"
             style={{
@@ -71,27 +73,28 @@ const ShelterProfile = () => {
               marginBottom: 16,
             }}
           />
-          <h3>{shelter_name}</h3>
+          <h3>{/*shelter_name*/}Shelter Information</h3>
         </div>
 
         <Descriptions title="Shelter Information" bordered column={1}>
           <Descriptions.Item label="Shelter Name">
             {shelter_name}
           </Descriptions.Item>
-          {/* <Descriptions.Item label="Representative Name">
+          <Descriptions.Item label="Representative Name">
             {representative_name ? (
               representative_name
             ) : (
-              <Tag color="warning">Not set yet</Tag>
+              <Tag color="warning">Null</Tag>
             )}
-          </Descriptions.Item> */}
-          {/*  <Descriptions.Item label="Username">
-            {username ? username : <Tag color="warning">Not set yet</Tag>}
-          </Descriptions.Item> */}
+          </Descriptions.Item>
+          <Descriptions.Item label="Username">
+            {username ? username : <Tag color="warning">Null</Tag>}
+          </Descriptions.Item>
           <Descriptions.Item label="Email">{email}</Descriptions.Item>
           <Descriptions.Item label="Phone Number">
             {phone_number}
           </Descriptions.Item>
+
           <Descriptions.Item label="State">{state}</Descriptions.Item>
           <Descriptions.Item label="District">{district}</Descriptions.Item>
           <Descriptions.Item label="Address">
