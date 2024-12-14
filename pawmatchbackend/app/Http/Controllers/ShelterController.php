@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
+
 class ShelterController extends Controller
 {
     use HasApiTokens;
@@ -27,6 +28,9 @@ class ShelterController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'website_url' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
+            'representative_name' => 'nullable|string|max:255',
+            'username' => 'nullable|string|max:255',
+            'contact_number' => 'nullable|string|max:15',
         ]);
 
         if ($validator->fails()) {
@@ -57,9 +61,21 @@ class ShelterController extends Controller
             'profile_picture' => $imagePath,
             'website_url' => $request->website_url,
             'description' => $request->description,
+            'representative_name' => $request->representative_name,
+            'username' => $request->username,
+            'contact_number' => $request->contact_number,
         ]);
-  
-       
+        $shelter->profile()->create([
+             'representative_name' => $request->representative_name,
+              'username' => $request->username,
+              'contact_number' => $request->contact_number,
+            // 可以添加其他默认字段
+        ]);
+       $shelter->profile()->create([
+        'representative_name' => $request->representative_name,
+        'username' => $request->username,
+        'contact_number' => $request->contact_number,
+        ]);
         return response()->json([
             'message' => 'Shelter registered successfully!',
             'data' => $shelter,
@@ -73,6 +89,9 @@ class ShelterController extends Controller
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
+        $shelter = Shelter::with('profile') // 加载关联的 ShelterProfile 数据
+        ->where('email', $request->email)
+        ->first();
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
