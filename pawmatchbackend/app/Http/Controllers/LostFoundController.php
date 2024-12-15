@@ -242,7 +242,7 @@ class LostFoundController extends Controller
         
                 // Fetch the specific report with user information using DB::table
                 $report = DB::table('reportlostfound')
-                    ->join('member', 'reportlostfound.user_id', '=', 'member.id')
+                    ->join('member', 'reportlostfound.user_id', '=', 'member.user_id')
                     ->where('reportlostfound.report_id', $reportID)
                     ->select(
                         // Report information
@@ -253,7 +253,7 @@ class LostFoundController extends Controller
                         'reportlostfound.status',
                         
                         // User information
-                        'member.id as user_id',
+                        'member.user_id as user_id',
                         'member.name as name',
                         'member.email as email',
                         'member.phone_number as phoneNumber',
@@ -354,10 +354,11 @@ class LostFoundController extends Controller
         {
             try {
                 $excludedUserId = $request->input('userID'); // Get the excluded user ID from the request
-        
+
                 $reports = DB::table('reportlostfound')
-                    ->join('member', 'reportlostfound.user_id', '=', 'member.id')
+                    ->join('member', 'reportlostfound.user_id', '=', 'member.user_id')
                     ->where('reportlostfound.status', 'active')
+                    ->where('reportlostfound.user_id', '!=', $excludedUserId) // Exclude reports by the user
                     ->whereNotIn('reportlostfound.report_id', function ($subquery) use ($excludedUserId) {
                         $subquery->select('replylostreport.report_id')
                                  ->from('replylostreport')
@@ -365,12 +366,13 @@ class LostFoundController extends Controller
                     })
                     ->select(
                         'reportlostfound.*',
-                        'member.id',
+                        'member.user_id',
                         'member.*',
                         'reportlostfound.district as district',
                         'reportlostfound.state as state'
                     )
                     ->get();
+                
         
                 // Encode images in the reports
                 $reports = $reports->map(function ($report) {
@@ -453,7 +455,7 @@ class LostFoundController extends Controller
             // Step 2: Get users in the same district (excluding the report creator) using DB::
             $users = DB::table('member')
                 ->where('district', $district)
-                ->where('id', '!=', $reportUserID)
+                ->where('user_id', '!=', $reportUserID)
                 ->pluck('email');
         
             if ($users->isEmpty()) {
@@ -498,7 +500,7 @@ class LostFoundController extends Controller
         
             // Step 2: Get one user in the same district (excluding the report creator) using DB::
             $user = DB::table('member')
-                ->where('id', $reportUserID)
+                ->where('user_id', $reportUserID)
                 ->first();
         
             if (!$user) {
@@ -531,8 +533,8 @@ class LostFoundController extends Controller
             try {
                 // Fetch the user details from the `member` table
                 $user = DB::table('member')
-                    ->select('id', 'phone_number', 'email', 'name', 'detailed_address','district','state')
-                    ->where('id', $user_id)
+                    ->select('user_id', 'phone_number', 'email', 'name', 'detailed_address','district','state')
+                    ->where('user_id', $user_id)
                     ->first();
     
                 // Check if user exists

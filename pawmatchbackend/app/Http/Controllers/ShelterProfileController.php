@@ -54,7 +54,7 @@ class ShelterProfileController extends Controller
         // 验证请求数据
         
         $validated = $request->validate([
-            //'shelter_name' => 'required|string|max:255',
+            'shelter_name' => 'required|string|max:255',
             //'email' => 'required|email|unique:shelters,email,' . $shelter->id,
             'state' => 'required|string|max:255',
             'district' => 'required|string|max:255',
@@ -84,6 +84,7 @@ class ShelterProfileController extends Controller
         $profile = $shelter->profile; 
         if ($profile) {
             $profile->update([
+                'shelter_name' => $request->shelter_name,
                 'profile_picture' => $validated['profile_picture'] ?? $profile->profile_picture,
                 'website_url' => $shelter->website_url,
                 'description' => $shelter->description,
@@ -115,7 +116,5 @@ class ShelterProfileController extends Controller
         ], 200);
     }
 }
-
-
 
 

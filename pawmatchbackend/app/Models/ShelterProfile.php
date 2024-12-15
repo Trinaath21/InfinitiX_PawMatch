@@ -10,12 +10,12 @@ class ShelterProfile extends Model
     use HasFactory;
     protected $table = 'shelter_profiles';
 
-
     protected $fillable = [
         'shelter_id',
         'profile_picture',
         'representative_name',
         'username',
+        'contact_number',
     ];
 
     // Define the relationship with the Shelter model

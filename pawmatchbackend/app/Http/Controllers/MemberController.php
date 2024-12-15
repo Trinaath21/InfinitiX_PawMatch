@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Member;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Sanctum\HasApiTokens;
 
 class MemberController extends Controller
 {
+    use HasApiTokens;
+
     /**
      * Register a new member and create a default profile.
      */
@@ -21,24 +24,32 @@ class MemberController extends Controller
             'detailed_address' => 'required|string|max:255',
             'NoOfPets' => 'required|integer',
             'phone_number' => 'required|string|max:15',
-            'email' => 'required|email|unique:member,email',
+            'email' => 'required|email|unique:member,email', 
             'password' => 'required|string|min:6',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'username' => 'nullable|string|max:255',
+            'Age' => 'nullable|integer',
+            'bio' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
+            if ($validator->errors()->has('email')) {
+                return response()->json([
+                    'errors' => 'The email has already been taken',
+                ], 409); // 409  error means 
+            }
             return response()->json([
                 'errors' => $validator->errors(),
             ], 400);
         }
 
+        // handle image upload
         $imagePath = null;
-        if ($request->hasFile('profile_picture') && $request->file('profile_picture')->isValid()) {
-            $image = $request->file('profile_picture');
-            $imagePath = $image->store('profile_pictures', 'public');
+        if ($request->hasFile('profile_picture')) {
+            $imagePath = $request->file('profile_picture')->store('profile_pictures', 'public');
         }
 
-        // 创建用户
+        // create member data
         $member = Member::create([
             'name' => $request->name,
             'state' => $request->state,
@@ -47,15 +58,18 @@ class MemberController extends Controller
             'NoOfPets' => $request->NoOfPets,
             'phone_number' => $request->phone_number,
             'email' => $request->email,
-            'password' => $request->password,
-            'profile_picture' => $request->profile_picture
+            'password' => bcrypt($request->password), // password encryption
+            'profile_picture' => $imagePath,
+            'username' => $request->username,
+            'Age' => $request->Age,
+            'bio' => $request->bio,
         ]);
 
-        // 创建默认的 profile 数据
+        // create default profile data and associate it with member
         $member->profile()->create([
-            'bio' => 'Default bio', // 默认的 bio
-            'dob' => '1900-01-01',   // 默认的出生日期
-            // 可以添加其他默认字段
+            'bio' => $request->bio ?? 'Default bio', // default bio
+            'username' => $request->username,
+            'Age' => $request->Age,
         ]);
 
         return response()->json([
@@ -78,26 +92,27 @@ class MemberController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        // 获取 Member 数据
-        $member = Member::where('email', $request->email)->first();
+        // find member by email and load associated profile data
+        $member = Member::with('profile') // load associated MemberProfile data
+            ->where('email', $request->email)
+            ->first();
 
         if (!$member) {
             return response()->json(['message' => 'Email not found'], 404);
         }
 
-        // 验证密码
-        if ($request->password !== $member->password) {
+        // validate password
+        if (!Hash::check($request->password, $member->password)) {
             return response()->json(['message' => 'Invalid password'], 401);
         }
-        
 
-        // 创建登录 token
+        // create login token
         $token = $member->createToken('login-token')->plainTextToken;
 
         return response()->json([
             'message' => 'Login successful',
             'data' => [
-                'user_id' => $member->id,  // 添加 member_id
+                'user_id' => $member->user_id,  // return member's user_id
                 'member_name' => $member->name,
                 'email' => $member->email,
                 'token' => $token,

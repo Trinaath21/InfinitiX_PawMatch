@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
-
 class ShelterController extends Controller
 {
     use HasApiTokens;
@@ -69,13 +68,13 @@ class ShelterController extends Controller
              'representative_name' => $request->representative_name,
               'username' => $request->username,
               'contact_number' => $request->contact_number,
-            // 可以添加其他默认字段
+        
         ]);
-       $shelter->profile()->create([
+       /* $shelter->profile()->create([
         'representative_name' => $request->representative_name,
         'username' => $request->username,
         'contact_number' => $request->contact_number,
-        ]);
+        ]); */
         return response()->json([
             'message' => 'Shelter registered successfully!',
             'data' => $shelter,
@@ -89,7 +88,7 @@ class ShelterController extends Controller
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
-        $shelter = Shelter::with('profile') // 加载关联的 ShelterProfile 数据
+        $shelter = Shelter::with('profile') // load associated ShelterProfile data
         ->where('email', $request->email)
         ->first();
 
@@ -110,7 +109,7 @@ class ShelterController extends Controller
         return response()->json([
             'message' => 'Shelter login successful',
             'data' => [
-            'shelter_id' => $shelter->id,  // 添加 shelter_id
+            'shelter_id' => $shelter->shelter_id,  // add shelter_id
             'shelter_name' => $shelter->shelter_name,
             'email' => $shelter->email,
             'token' => $token,

@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
-  Input,
-  Button,
   Form,
-  Spin,
-  message,
+  Input,
   InputNumber,
   Cascader,
+  Button,
+  Spin,
+  message,
+  Upload,
   Select,
 } from "antd";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+
 const stateDistrictData = [
   {
     value: "Johor",
@@ -178,12 +180,18 @@ const stateDistrictData = [
     children: [{ value: "Federal Territory", label: "Federal Territory" }],
   },
 ];
-const { Option } = Select;
+
 const EditMemberProfile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const prefixSelector = (
+    <Select defaultValue="06" style={{ width: 70 }}>
+      <Select.Option value="06">06</Select.Option>
+      <Select.Option value="86">86</Select.Option>
+    </Select>
+  );
 
   const authToken = localStorage.getItem("login-token");
 
@@ -220,95 +228,153 @@ const EditMemberProfile = () => {
     };
     delete updatedValues.state_district;
     axios
-      .put("http://localhost:8000/api/updateProfile", values, {
+      .put("http://localhost:8000/api/updateProfile", updatedValues, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       })
       .then((response) => {
-        message.success("Profile updated successfully!");
-        setProfile(response.data.profile);
-        navigate("/main/profiles/member"); 
+        message.success("Member Profile updated successfully!");
+        //setProfile(response.data.profile);
+        navigate("/main/profiles/member");
       })
       .catch((err) => {
-        message.error("Failed to update profile");
+        message.error(
+          err.response?.data?.message || "Failed to update member profile"
+        );
         setLoading(false);
       });
   };
+  // Loading state
+  if (loading) {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+  // Error state
+  if (error) {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <p className="error">{error}</p>
+        <Button type="primary" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: "20px" }}>
-      {error && <p className="error">{error}</p>}
-      {loading ? (
-        <Spin size="large" />
-      ) : profile ? (
-        <Form
-          layout="vertical"
-          initialValues={{
-            phone_number: profile.phone_number,
-            state_district: [profile.state, profile.district],
-            district: profile.district,
-            detailed_address: profile.detailed_address,
-            NoOfPets: profile.NoOfPets,
-            //  bio: profile.bio || "",
-          }}
-          onFinish={handleSubmit}
+    <div style={{ padding: "20px", maxWidth: 800, margin: "auto" }}>
+      <Form
+        layout="vertical"
+        initialValues={{
+          username: profile.username,
+          Age: profile.Age,
+          bio: profile.bio,
+          phone_number: profile.phone_number,
+          state_district: [profile.state, profile.district],
+          //district: profile.district,
+          detailed_address: profile.detailed_address,
+          NoOfPets: profile.NoOfPets,
+          //  bio: profile.bio || "",
+        }}
+        onFinish={handleSubmit}
+      >
+        <Form.Item
+          label="User Name"
+          name="username"
+          rules={[{ required: false, message: "Please input new username!" }]}
         >
-          <Form.Item
-            label="Member Name"
-            name="name"
-            rules={[{ required: false, message: "Please input your name!" }]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item label="Phone Number" name="phone_number">
-            <Input />
-          </Form.Item>
+          <Input />
+        </Form.Item>
 
-          <Form.Item
-            name="state_district"
-            label="State and District"
-            rules={[
-              {
-                required: false,
-                message: "Please select your state and district!",
-              },
-            ]}
-          >
-            <Cascader options={stateDistrictData} placeholder="Please select" />
-          </Form.Item>
-          <Form.Item
-            name="detailed_address"
-            label="Detailed Address"
-            rules={[
-              {
-                required: false,
-                message: "Please input your detailed address!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="NoOfPets"
-            label="Number of Pets"
-            rules={[
-              {
-                required: false,
-              },
-            ]}
-          >
-            <InputNumber min={0} style={{ width: "100%" }} />
-          </Form.Item>
-          <div style={{ textAlign: "center" }}>
-            <Button type="primary" htmlType="submit">
-              Save Changes
-            </Button>
-          </div>
-        </Form>
-      ) : (
-        <p>No profile found</p>
-      )}
+        <Form.Item
+          label="Phone Number"
+          name="phone_number"
+          rules={[
+            { required: false, message: "Please input your phone number!" },
+            {
+              pattern: /^\d{6,}$/,
+              message: "Phone number must be at least 6 digits.",
+            },
+          ]}
+        >
+          <Input addonBefore={prefixSelector} />
+        </Form.Item>
+
+        <Form.Item
+          name="state_district"
+          label="State and District"
+          rules={[
+            {
+              required: false,
+              message: "Please select your state and district!",
+            },
+          ]}
+        >
+          <Cascader options={stateDistrictData} placeholder="Please select" />
+        </Form.Item>
+        <Form.Item
+          name="detailed_address"
+          label="Detailed Address"
+          rules={[
+            {
+              required: false,
+              message: "Please input your detailed address!",
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="NoOfPets"
+          label="Number of Pets"
+          rules={[
+            {
+              required: false,
+            },
+          ]}
+        >
+          <InputNumber min={0} style={{ width: "100%" }} />
+        </Form.Item>
+
+        <Form.Item
+          name="Age"
+          label="Age"
+          rules={[{ required: false, message: "Please input your age!" }]}
+        >
+          <InputNumber min={0} style={{ width: "100%" }} />
+        </Form.Item>
+
+        <Form.Item
+          name="bio"
+          label="Gender"
+          rules={[{ required: false, message: "Please select your gender!" }]}
+        >
+          <Select placeholder="Select your gender">
+            <Select.Option value="Male">Male</Select.Option>
+            <Select.Option value="Female">Female</Select.Option>
+            <Select.Option value="Attack Helicopter">
+              Attack Helicopter
+            </Select.Option>
+            <Select.Option value="Walmart Bag">Walmart Bag</Select.Option>
+            <Select.Option value="Others">Others</Select.Option>
+            <Select.Option value="Prefer not to say">
+              Prefer not to say
+            </Select.Option>
+          </Select>
+        </Form.Item>
+
+        <div style={{ textAlign: "center" }}>
+          <Button type="primary" htmlType="submit">
+            Save Changes
+          </Button>
+        </div>
+      </Form>
+      {/* ) : (<p>No profile found</p>
+      ) */}
     </div>
   );
 };

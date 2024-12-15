@@ -305,7 +305,7 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
                         >
                             <Input
                                 name="phoneNumber"
-                                disabled={!!userData?.phoneNumber}
+                                disabled={!!userData?.phone_number}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 value={formik.values.phoneNumber}

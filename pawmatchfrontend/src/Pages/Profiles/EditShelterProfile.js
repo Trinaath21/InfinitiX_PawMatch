@@ -9,6 +9,7 @@ import {
   Button,
   Spin,
   message,
+  Tag,
   Select,
 } from "antd";
 
@@ -271,6 +272,7 @@ const EditShelterProfile = () => {
       <Form
         layout="vertical"
         initialValues={{
+          shelter_name: profile.shelter_name,
           representative_name: profile.representative_name,
           username: profile.username,
           phone_number: profile.phone_number,
@@ -283,6 +285,9 @@ const EditShelterProfile = () => {
         }}
         onFinish={handleSubmit}
       >
+        <Form.Item label="Shelter Name" name="shelter_name">
+          <Input placeholder="Enter shelter name" />
+        </Form.Item>
         <Form.Item label="Representative Name" name="representative_name">
           <Input placeholder="Enter representative name" />
         </Form.Item>
@@ -299,6 +304,22 @@ const EditShelterProfile = () => {
             {
               pattern: /^\d{6,}$/,
               message: "Phone number must be at least 6 digits.",
+            },
+          ]}
+        >
+          <Input addonBefore={prefixSelector} />
+        </Form.Item>
+        <Form.Item
+          label="Contact Number"
+          name="contact_number"
+          rules={[
+            {
+              required: false,
+              message: "Please input your Representative contact number!",
+            },
+            {
+              pattern: /^\d{6,}$/,
+              message: "Contact number must be at least 6 digits.",
             },
           ]}
         >

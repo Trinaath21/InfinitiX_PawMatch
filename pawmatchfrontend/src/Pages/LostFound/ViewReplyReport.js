@@ -182,7 +182,7 @@ const ViewReplyReport = () => {
                             backgroundColor: '#004b80',
                             color: 'white',
                             fontSize: '20px',
-                            height: '50px',
+                            height: '30px',
                             width: '10vw',
                         }}
                     >

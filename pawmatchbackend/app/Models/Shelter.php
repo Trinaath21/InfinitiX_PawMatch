@@ -10,6 +10,10 @@ class Shelter extends Model
     //
     use HasFactory,HasApiTokens;
     protected $table = 'shelter';
+    protected $primaryKey = 'shelter_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    
     protected $fillable=[
         'shelter_name',
         'state',
@@ -25,10 +29,10 @@ class Shelter extends Model
     ];
     public function profile()
     {
-        return $this->hasOne(ShelterProfile::class, 'shelter_id', 'id');  // 外键是 member_id，主键是 id
+        return $this->hasOne(ShelterProfile::class, 'shelter_id', 'shelter_id');  // 外键是 member_id，主键是 id
     }
-    public function shelterDonation()
-    {
-        return $this->hasOne(ShelterDonation::class, 'shelter_id');
-    }
+  //  public function shelterDonation()
+  //  {
+   //     return $this->hasOne(ShelterDonation::class, 'shelter_id');
+   // }
 }

@@ -55,6 +55,7 @@ const ShelterProfile = () => {
     description,
     representative_name,
     username,
+    contact_number,
   } = profile;
 
   return (
@@ -91,10 +92,12 @@ const ShelterProfile = () => {
             {username ? username : <Tag color="warning">Null</Tag>}
           </Descriptions.Item>
           <Descriptions.Item label="Email">{email}</Descriptions.Item>
-          <Descriptions.Item label="Phone Number">
+          <Descriptions.Item label="Shelter Phone Number">
             {phone_number}
           </Descriptions.Item>
-
+          <Descriptions.Item label="Representative Contact Number">
+            {contact_number}
+          </Descriptions.Item>
           <Descriptions.Item label="State">{state}</Descriptions.Item>
           <Descriptions.Item label="District">{district}</Descriptions.Item>
           <Descriptions.Item label="Address">
@@ -103,7 +106,7 @@ const ShelterProfile = () => {
           <Descriptions.Item label="Number of Pets">
             {NoOfPets}
           </Descriptions.Item>
-          <Descriptions.Item label="Website">
+          <Descriptions.Item label="Our Website">
             {website_url ? (
               <a href={website_url} target="_blank" rel="noopener noreferrer">
                 {website_url}
