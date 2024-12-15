@@ -47,7 +47,7 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
     ]),
     getItem('Forum', '5', <UserOutlined />, () => navigate('/forum')),
     getItem('Donation', '6', <MoneyCollectOutlined />, () => navigate('/ViewAllDonation')),
-    getItem('Logout', '6', <LogoutOutlined />, () => {
+    getItem('Logout', '7', <LogoutOutlined />, () => {
       localStorage.clear(); // Clears all local storage
       navigate('/landing'); // Navigates to /landing
   }),
@@ -68,9 +68,10 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
       getItem('Public Listing', '4-1', null, () => navigate('/PublicStrayListings')),
       getItem('Personal Listing', '4-2', null, () => navigate('/PersonalStrayListings')),
     ]),
-    getItem('Forum', '5', <UserOutlined />, () => navigate('/forum')),
+    getItem('Forum', '5', <DesktopOutlined />, () => navigate('/forum')),
     getItem('Donation', '6', <MoneyCollectOutlined />, () => navigate('/ViewAllDonation')),
-    getItem('Logout', '6', <LogoutOutlined />, () => {
+    getItem('Profile', '7', <UserOutlined />, () => navigate('profiles/member')),
+    getItem('Logout', '8', <LogoutOutlined />, () => {
       localStorage.clear(); // Clears all local storage
       navigate('/landing'); // Navigates to /landing
   }),
@@ -87,7 +88,8 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
     ]),
     getItem('Forum', '4', <UserOutlined />, () => navigate('/forum')),
     getItem('Donation', '5', <MoneyCollectOutlined />, () => navigate('/ViewMyDonation')),
-    getItem('Logout', '6', <LogoutOutlined />, () => {
+    getItem('Profile', '6', <UserOutlined />, () => navigate('profiles/shelter')),
+    getItem('Logout', '7', <LogoutOutlined />, () => {
       localStorage.clear(); // Clears all local storage
       navigate('/landing'); // Navigates to /landing
   }),

@@ -25,6 +25,8 @@ import ViewMoreStrayDetails from '../Stray/ViewMoreStrayDetails';
 // Forum
 import PostDetails from '../Forum/PostDetails.js';
 import ContentComponent from '../Forum/ForumPostComponent.js';
+
+//User Management
 import Login from '../Pages/Login/index.js';
 import Register from '../Pages/Register/index.js';
 import ForgotPassword from '../Pages/Password/forgetpassword.js';
