@@ -58,18 +58,18 @@ class MemberController extends Controller
             'NoOfPets' => $request->NoOfPets,
             'phone_number' => $request->phone_number,
             'email' => $request->email,
-            'password' => bcrypt($request->password), // password encryption
+            'password' => $request->password, // password encryption
             'profile_picture' => $imagePath,
-            'username' => $request->username,
-            'Age' => $request->Age,
-            'bio' => $request->bio,
+            // 'username' => $request->username,
+            // 'Age' => $request->Age,
+            // 'bio' => $request->bio,
         ]);
 
         // create default profile data and associate it with member
         $member->profile()->create([
             'bio' => $request->bio ?? 'Default bio', // default bio
-            'username' => $request->username,
-            'Age' => $request->Age,
+            'username' => $request->name,
+            'Age' => $request->Age ?? 0,
         ]);
 
         return response()->json([
@@ -102,9 +102,10 @@ class MemberController extends Controller
         }
 
         // validate password
-        if (!Hash::check($request->password, $member->password)) {
+        if ($request->password !== $member->password) {
             return response()->json(['message' => 'Invalid password'], 401);
         }
+        
 
         // create login token
         $token = $member->createToken('login-token')->plainTextToken;

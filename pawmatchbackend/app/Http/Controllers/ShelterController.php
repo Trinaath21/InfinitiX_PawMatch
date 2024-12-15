@@ -27,9 +27,6 @@ class ShelterController extends Controller
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'website_url' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'representative_name' => 'nullable|string|max:255',
-            'username' => 'nullable|string|max:255',
-            'contact_number' => 'nullable|string|max:15',
         ]);
 
         if ($validator->fails()) {
@@ -60,14 +57,14 @@ class ShelterController extends Controller
             'profile_picture' => $imagePath,
             'website_url' => $request->website_url,
             'description' => $request->description,
-            'representative_name' => $request->representative_name,
-            'username' => $request->username,
-            'contact_number' => $request->contact_number,
+            // 'representative_name' => $request->representative_name,
+            // 'username' => $request->username,
+            // 'contact_number' => $request->contact_number,
         ]);
         $shelter->profile()->create([
-             'representative_name' => $request->representative_name,
-              'username' => $request->username,
-              'contact_number' => $request->contact_number,
+             'representative_name' => $request->shelter_name,
+              'username' => $request->username ?? "",
+              'contact_number' => $request->phone_number,
         
         ]);
        /* $shelter->profile()->create([
