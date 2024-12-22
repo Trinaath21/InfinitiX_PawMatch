@@ -24,7 +24,7 @@ class ForumPostController extends Controller
         ]); 
 
         // Determine user type and assign ownership
-     $user_id = $request->input("user_id");
+     //$user_id = $request->input("user_id");
      $userRole = $request->input("role");
      if ($userRole == "shelter"){
         $shelter_id = $request->input("shelter_id");
@@ -73,9 +73,9 @@ class ForumPostController extends Controller
             'title' => $validatedData['title'],
             'content' => $validatedData['content'],
             'images' => $imagePaths, // Save array of image paths
-            'user_id' => 1, // Temporarily set a user ID
-            'shelter_id' => null,
-            'member_id' => null,
+            //'user_id' => 1, // Temporarily set a user ID
+            'shelter_id' => $shelter_id,
+            'member_id' => $member_id,
            // 'role' => $role,
         ]);
 
@@ -85,9 +85,26 @@ class ForumPostController extends Controller
         return response()->json(['message' => 'Post created successfully!', 'post' => $post], 201);
     }
 
-    public function getUserPosts($user_id)
+    public function getUserPosts(Request $request)
 {
-    $posts = ForumPost::where('user_id', $user_id)->select('post_id', 'title', 'content', 'images', 'created_at','updated_at')->orderBy('updated_at', 'desc')->withCount('comments')->get();
+    $role = $request->input('role');
+    $shelter_id = $request->input('shelter_id');
+    $member_id = $request->input('member_id');
+
+    if ($role === 'shelter' && $shelter_id) {
+        $posts = ForumPost::where('shelter_id', $shelter_id)
+            ->orderBy('updated_at', 'desc')
+            ->withCount('comments')
+            ->get();
+    } elseif ($role === 'member' && $member_id) {
+        $posts = ForumPost::where('member_id', $member_id)
+            ->orderBy('updated_at', 'desc')
+            ->withCount('comments')
+            ->get();
+    } else {
+        return response()->json(['error' => 'Invalid role or ID.'], 422);
+    }
+    //$posts = ForumPost::where('user_id', $user_id)->select('post_id', 'title', 'content', 'images', 'created_at','updated_at')->orderBy('updated_at', 'desc')->withCount('comments')->get();
    // $posts 
     
     if ($posts->isEmpty()) {
@@ -110,7 +127,7 @@ class ForumPostController extends Controller
     public function show($post_id)
     {
        // $post = ForumPost::find($post_id);
-       $post = ForumPost::with('user')->find($post_id);
+       $post = ForumPost::with('shelter','member')->find($post_id);
        Log::info($post);
         if (!$post) {
             return response()->json(['message' => 'Post not found'], 404);
@@ -121,7 +138,7 @@ class ForumPostController extends Controller
     // Update a specific post
     public function update(Request $request, $post_id)
     {
-        $post = ForumPost::with('user')->findOrFail($post_id);
+        $post = ForumPost::with('shelter','member')->findOrFail($post_id);
         $post = ForumPost::find($post_id);
         if (!$post) {
             return response()->json(['message' => 'Post not found'], 404);
@@ -200,7 +217,7 @@ class ForumPostController extends Controller
 
 public function getComments($post_id)
 {
-    $comments = Comment::where('post_id', $post_id)->orderBy('created_at')->with('user')->get();
+    $comments = Comment::where('post_id', $post_id)->orderBy('created_at')->with('shelter','member')->get();
     return response()->json($comments);
 }
 
