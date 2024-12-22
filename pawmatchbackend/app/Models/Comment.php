@@ -11,7 +11,7 @@ class Comment extends Model
 
     protected $table = 'comment';
     protected $primaryKey = 'comment_id';
-    protected $fillable = ['post_id', 'comment'];
+    protected $fillable = ['post_id', 'comment','shelter_id','member_id'];
 
     // Define relationships
     public function post()
