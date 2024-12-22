@@ -13,6 +13,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
+  TeamOutlined,
   MoneyCollectOutlined,
   DesktopOutlined
 } from '@ant-design/icons';
@@ -47,7 +48,7 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
     getItem('Stray', 'sub4', <YuqueFilled />, null, [
       getItem('Public Listing', '4-1', null, () => navigate('/PublicStrayListings')),
     ]),
-    getItem('Forum', '5', <UserOutlined />, () => navigate('/forum')),
+    getItem('Forum', '5', <TeamOutlined />, () => navigate('/forum')),
     getItem('Donation', '6', <MoneyCollectOutlined />, () => navigate('/ViewAllDonation')),
     getItem('Login', '7', <LoginOutlined />, () => {
       localStorage.clear(); // Clears all local storage
@@ -70,7 +71,10 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
       getItem('Public Listing', '4-1', null, () => navigate('/PublicStrayListings')),
       getItem('Personal Listing', '4-2', null, () => navigate('/PersonalStrayListings')),
     ]),
-    getItem('Forum', '5', <DesktopOutlined />, () => navigate('/forum')),
+    getItem('Forum', '5', <TeamOutlined/>, null,[
+      getItem('General Posts', '5-1', null, () => navigate('/forum')),
+      getItem('My Posts', '5-2', null, () => navigate('/forum/myPost')),
+    ]),
     getItem('Donation', '6', <MoneyCollectOutlined />, () => navigate('/ViewAllDonation')),
     getItem('Profile', '7', <UserOutlined />, () => navigate('profiles/member')),
     getItem('Logout', '8', <LogoutOutlined />, () => {
@@ -88,10 +92,13 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
     getItem('Stray', 'sub3', <YuqueFilled />, null, [
       getItem('Public Listing', '3-1', null, () => navigate('/PublicStrayListings')),
     ]),
-    getItem('Forum', '4', <UserOutlined />, () => navigate('/forum')),
-    getItem('Donation', '5', <MoneyCollectOutlined />, () => navigate('/ViewMyDonation')),
-    getItem('Profile', '6', <UserOutlined />, () => navigate('profiles/shelter')),
-    getItem('Logout', '7', <LogoutOutlined />, () => {
+    getItem('Forum', '5', <TeamOutlined />, null,[
+      getItem('General Posts', '5-1', null, () => navigate('/forum')),
+      getItem('My Posts', '5-2', null, () => navigate('/forum/myPost')),
+    ]),
+    getItem('Donation', '6', <MoneyCollectOutlined />, () => navigate('/ViewMyDonation')),
+    getItem('Profile', '7', <UserOutlined />, () => navigate('profiles/shelter')),
+    getItem('Logout', '8', <LogoutOutlined />, () => {
       localStorage.clear(); // Clears all local storage
       navigate('/landing'); // Navigates to /landing
   }),
