@@ -11,7 +11,7 @@ class Comment extends Model
 
     protected $table = 'comment';
     protected $primaryKey = 'comment_id';
-    protected $fillable = ['post_id', 'user_id', 'comment'];
+    protected $fillable = ['post_id', 'comment','shelter_id','member_id'];
 
     // Define relationships
     public function post()
@@ -19,9 +19,19 @@ class Comment extends Model
         return $this->belongsTo(ForumPost::class, 'post_id');
     }
 
-    public function user()
+   /* public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }*/
+
+    public function shelter()
+    {
+        return $this->belongsTo(Shelter::class, 'shelter_id');
+    }
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'member_id');
     }
 }
 

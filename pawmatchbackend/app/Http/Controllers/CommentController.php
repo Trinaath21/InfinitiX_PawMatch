@@ -16,7 +16,7 @@ class CommentController extends Controller
 
     $comment = Comment::create([
         'post_id' => $validated['post_id'],
-        'user_id' => 1, // Temporarily set a user ID
+       // 'user_id' => 1, // Temporarily set a user ID
         'comment' => $validated['comment'],
     ]);
     return response()->json($comment, 201);
@@ -31,7 +31,7 @@ class CommentController extends Controller
         $post = ForumPost::findOrFail($post_id);
 
     $comments = $post->comments()
-        ->with('user') // Load the associated user
+        ->with('shelter','member') // Load the associated user
         ->orderBy('created_at', 'asc') // Sort by creation time in ascending order
         ->get();
 
