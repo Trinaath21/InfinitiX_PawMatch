@@ -25,12 +25,9 @@ class ShelterController extends Controller
             'email' => 'required|email|unique:shelter,email',
             'password' => 'required|string|min:6',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            //'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'website_url' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
-          //  'representative_name' => 'nullable|string|max:255',
-          //  'username' => 'nullable|string|max:255',
-          //  'contact_number' => 'nullable|string|max:15',
+        
         ]);
 
         if ($validator->fails()) {
@@ -111,6 +108,36 @@ class ShelterController extends Controller
             'email' => $shelter->email,
             'token' => $token,
         ],
+        ], 200);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6|different:current_password',
+            'confirm_password' => 'required|same:new_password'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        $shelter = Shelter::find(auth('sanctum')->user()->shelter_id);
+
+        if (!Hash::check($request->current_password, $shelter->password)) {
+            return response()->json([
+                'message' => 'password is incorrect'
+            ], 401);
+        }
+
+        $shelter->password = Hash::make($request->new_password);
+        $shelter->save();
+
+        return response()->json([
+            'message' => 'Password changed successfully'
         ], 200);
     }
 }

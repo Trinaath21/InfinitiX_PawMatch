@@ -88,4 +88,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('showShelterProfile', [ShelterProfileController::class, 'showShelterProfile']);
     Route::put('updateShelterProfile', [ShelterProfileController::class, 'updateShelterProfile']);
 });
-
+//Change password 
+Route::middleware('auth:sanctum')->post('/shelter/change-password', [ShelterController::class, 'changePassword']);
+Route::middleware('auth:sanctum')->post('/member/change-password', [MemberController::class, 'changeMemberPassword']);

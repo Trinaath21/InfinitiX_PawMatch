@@ -12,6 +12,7 @@ import {
   Tag,
   Select,
   Upload,
+  Modal,
 } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
@@ -200,6 +201,9 @@ const EditShelterProfile = () => {
 
   const [imageUrl, setImageUrl] = useState(profile?.profile_picture || null);
 
+  const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] =
+    useState(false);
+
   useEffect(() => {
     if (authToken) {
       axios
@@ -286,6 +290,25 @@ const EditShelterProfile = () => {
         message.success("Profile picture uploaded successfully!");
       });
     }
+  };
+
+  // 添加修改密码的处理函数
+  const handleChangePassword = (values) => {
+    axios
+      .post("http://localhost:8000/api/shelter/change-password", values, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
+      .then((response) => {
+        message.success("Password changed successfully");
+        setIsChangePasswordModalVisible(false);
+      })
+      .catch((error) => {
+        message.error(
+          error.response?.data?.message || "Password change failed"
+        );
+      });
   };
 
   // Loading state
@@ -457,11 +480,90 @@ const EditShelterProfile = () => {
           <Button type="primary" htmlType="submit">
             Save Changes
           </Button>
-          <Button onClick={() => navigate("/main/profiles/shelter")}>
+          <Button
+            type="primary"
+            onClick={() => navigate("/main/profiles/shelter")}
+          >
             Cancel
           </Button>
         </div>
       </Form>
+      <div
+        style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}
+      >
+        <Button
+          type="primary"
+          onClick={() => setIsChangePasswordModalVisible(true)}
+        >
+          Change Password
+        </Button>
+      </div>
+
+      <Modal
+        title="Change Password"
+        open={isChangePasswordModalVisible}
+        onCancel={() => setIsChangePasswordModalVisible(false)}
+        footer={null}
+      >
+        <Form layout="vertical" onFinish={handleChangePassword}>
+          <Form.Item
+            name="current_password"
+            label="Current Password"
+            rules={[
+              { required: true, message: "Please input current password" },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="new_password"
+            label="New Password"
+            rules={[
+              { required: true, message: "Please input new password" },
+              { min: 6, message: "Password must be at least 6 characters" },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="confirm_password"
+            label="Confirm New Password"
+            dependencies={["new_password"]}
+            rules={[
+              { required: true, message: "Please confirm new password" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("new_password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error(
+                      "The two passwords that you entered do not match."
+                    )
+                  );
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item style={{ textAlign: "right", marginBottom: 0 }}>
+            <Button
+              type="default"
+              style={{ marginRight: 8 }}
+              onClick={() => setIsChangePasswordModalVisible(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Confirm
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
       <style jsx>{`
         .avatar-uploader > .ant-upload {
           width: 128px;

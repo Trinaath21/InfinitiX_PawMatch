@@ -119,4 +119,33 @@ class MemberController extends Controller
             ],
         ], 200);
     }
+    public function changeMemberPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6|different:current_password',
+            'confirm_password' => 'required|same:new_password'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        $member = Member::find(auth('sanctum')->user()->user_id);
+
+        if (!Hash::check($request->current_password, $member->password)) {
+            return response()->json([
+                'message' => 'Current password is incorrect'
+            ], 401);
+        }
+
+        $member->password = Hash::make($request->new_password);
+        $member->save();
+
+        return response()->json([
+            'message' => 'Password changed successfully'
+        ], 200);
+    }
 }
