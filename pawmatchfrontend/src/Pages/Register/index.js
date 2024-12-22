@@ -230,7 +230,7 @@ const Register = () => {
       if (fileList[0]) {
         formData.append("profile_picture", fileList[0].originFileObj);
       }
-
+      console.log("updated values", formData);
       const endpoint =
         role === "Shelter" ? "/shelter/register" : "/member/register";
       const response = await axios.post(
@@ -260,7 +260,7 @@ const Register = () => {
       ]}
     >
       <Select style={{ width: 70 }} placeholder="Code">
-        <Option value="06">+06</Option>
+        <Option value="60">+60</Option>
         <Option value="86">+86</Option>
       </Select>
     </Form.Item>
@@ -333,19 +333,24 @@ const Register = () => {
             </Form.Item>
 
             <Form.Item
-              name="password"
-              label="Password"
-              rules={[
-                { required: true, message: "Please input your password!" },
-                {
-                  min: 6,
-                  message: "Password must be at least 6 characters long!",
-                },
-              ]}
-              hasFeedback
-            >
-              <Input.Password />
-            </Form.Item>
+            name="password"
+            label="Password"
+            rules={[
+              { required: true, message: "Please input your password!" },
+              {
+                min: 6,
+                message: "Password must be at least 6 characters long!",
+              },
+              {
+                pattern: /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,}$/,
+                message: "Password must contain at least one uppercase letter, one symbol, and one number.",
+              },
+            ]}
+            hasFeedback
+          >
+            <Input.Password />
+          </Form.Item>
+
 
             <Form.Item
               name="confirm"
@@ -456,11 +461,6 @@ const Register = () => {
               </>
             )}
 
-            <Form.Item>
-              <Checkbox>
-                I have read the <a href="">agreement</a>
-              </Checkbox>
-            </Form.Item>
 
             <Form.Item>
               <Button type="primary" htmlType="submit" loading={loading}>

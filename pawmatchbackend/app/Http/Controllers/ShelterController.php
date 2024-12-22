@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 class ShelterController extends Controller
 {
     use HasApiTokens;
@@ -43,7 +45,13 @@ class ShelterController extends Controller
 
         $imagePath = null;
         if ($request->hasFile('profile_picture')) {
-            $imagePath = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $imageName = preg_replace('/\s+/', '_', strtolower($request->shelter_name)) . '_profile_picture.' . $request->file('profile_picture')->getClientOriginalExtension();
+    
+            // Store image in 'images' folder within public storage
+            $imagePath = $request->file('profile_picture')->storeAs('images', $imageName, 'public');
+            Storage::url($imagePath);
+            // Log the path to verify if it's being stored correctly
+            Log::info("Image stored at: " . $imagePath);
         }
 
         $shelter = Shelter::create([
@@ -54,7 +62,7 @@ class ShelterController extends Controller
             'NoOfPets' => $request->NoOfPets,
             'phone_number' => $request->phone_number,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'profile_picture' => $imagePath,
             'website_url' => $request->website_url,
             'description' => $request->description,
@@ -94,8 +102,8 @@ class ShelterController extends Controller
         if (!$shelter) {
             return response()->json(['message' => 'Shelter not found'], 404);
         }
-        if (!Hash::check($request->password, $shelter->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+        if ($request->password !== $shelter->password) {
+            return response()->json(['message' => 'Invalid password'], 401);
         }
 
         $token = $shelter->createToken('ShelterLoginToken')->plainTextToken;
@@ -126,14 +134,14 @@ class ShelterController extends Controller
         }
 
         $shelter = Shelter::find(auth('sanctum')->user()->shelter_id);
-
-        if (!Hash::check($request->current_password, $shelter->password)) {
+        
+        if ($request->current_password !== $shelter->password) {
             return response()->json([
                 'message' => 'password is incorrect'
             ], 401);
         }
 
-        $shelter->password = Hash::make($request->new_password);
+        $shelter->password = $request->new_password;
         $shelter->save();
 
         return response()->json([

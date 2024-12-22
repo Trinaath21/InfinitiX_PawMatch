@@ -80,7 +80,7 @@ const MemberProfile = () => {
       >
         <div style={{ textAlign: "center" }}>
           <img
-            src={`http://localhost:8000/storage/${
+            src={`http://localhost:8000${
               profile_picture || "profile-cover.jpg"
             }`}
             alt="Profile"
@@ -95,11 +95,9 @@ const MemberProfile = () => {
         </div>
 
         <Descriptions title="Member Information" bordered column={1}>
-          {/*<Descriptions.Item label="Member Name">{name}</Descriptions.Item>*/}
-
-          {/* <Descriptions.Item label="Username">
+          <Descriptions.Item label="Username">
             {username ? username : <Tag color="warning">Null</Tag>}
-          </Descriptions.Item> */}
+          </Descriptions.Item>
           <Descriptions.Item label="Gender">
             <div style={{ display: "flex", alignItems: "center" }}>
               {genderIcons[bio] || (
@@ -124,11 +122,10 @@ const MemberProfile = () => {
           <Descriptions.Item label="Number of Pets">
             {NoOfPets}
           </Descriptions.Item>
-          {/* <Descriptions.Item label="Age">{Age}</Descriptions.Item> */}
         </Descriptions>
 
         <div style={{ marginTop: 24, textAlign: "center" }}>
-          <Link to="/main/profiles/member/edit">
+          <Link to="/profiles/member/edit">
             <Button type="primary">Edit Profile</Button>
           </Link>
         </div>

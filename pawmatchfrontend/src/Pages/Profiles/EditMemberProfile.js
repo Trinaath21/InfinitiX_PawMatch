@@ -356,11 +356,6 @@ const EditMemberProfile = () => {
           <Select placeholder="Select your gender">
             <Select.Option value="Male">Male</Select.Option>
             <Select.Option value="Female">Female</Select.Option>
-            <Select.Option value="Attack Helicopter">
-              Attack Helicopter
-            </Select.Option>
-            <Select.Option value="Walmart Bag">Walmart Bag</Select.Option>
-            <Select.Option value="Others">Others</Select.Option>
             <Select.Option value="Prefer not to say">
               Prefer not to say
             </Select.Option>

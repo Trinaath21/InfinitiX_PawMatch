@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Member;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
@@ -17,6 +19,7 @@ class MemberController extends Controller
      */
     public function register(Request $request)
     {
+        // Validate the input
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'state' => 'required|string|max:255',
@@ -24,32 +27,39 @@ class MemberController extends Controller
             'detailed_address' => 'required|string|max:255',
             'NoOfPets' => 'required|integer',
             'phone_number' => 'required|string|max:15',
-            'email' => 'required|email|unique:member,email', 
+            'email' => 'required|email|unique:member,email',
             'password' => 'required|string|min:6',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'username' => 'nullable|string|max:255',
             'Age' => 'nullable|integer',
             'bio' => 'nullable|string|max:255',
         ]);
-
+    
         if ($validator->fails()) {
-            if ($validator->errors()->has('email')) {
-                return response()->json([
-                    'errors' => 'The email has already been taken',
-                ], 409); // 409  error means 
-            }
             return response()->json([
                 'errors' => $validator->errors(),
             ], 400);
         }
-
-        // handle image upload
+    
+        // Handle image upload if it exists
         $imagePath = null;
         if ($request->hasFile('profile_picture')) {
-            $imagePath = $request->file('profile_picture')->store('profile_pictures', 'public');
+            try {
+                // Custom file name based on user's name
+                $imageName = preg_replace('/\s+/', '_', strtolower($request->name)) . '_profile_picture.' . $request->file('profile_picture')->getClientOriginalExtension();
+    
+                // Store image in 'images' folder within public storage
+                $imagePath = $request->file('profile_picture')->storeAs('images', $imageName, 'public');
+                Storage::url($imagePath);
+                // Log the path to verify if it's being stored correctly
+                Log::info("Image stored at: " . $imagePath);
+            } catch (\Exception $e) {
+                Log::error("Error uploading image: " . $e->getMessage());
+                return response()->json(['error' => 'Image upload failed'], 500);
+            }
         }
-
-        // create member data
+    
+        // Create member data
         $member = Member::create([
             'name' => $request->name,
             'state' => $request->state,
@@ -58,25 +68,25 @@ class MemberController extends Controller
             'NoOfPets' => $request->NoOfPets,
             'phone_number' => $request->phone_number,
             'email' => $request->email,
-            'password' => bcrypt($request->password), // password encryption
-            'profile_picture' => $imagePath,
+            'password' => $request->password, // Ensure password is encrypted
+            'profile_picture' => $imagePath ? Storage::url($imagePath) : null, // Use the URL of the image if it exists
             'username' => $request->username,
-            'Age' => $request->Age,
-            'bio' => $request->bio,
         ]);
-
-        // create default profile data and associate it with member
+    
+        // Create profile data
         $member->profile()->create([
-            'bio' => $request->bio ?? 'Default bio', // default bio
+            'bio' => $request->bio ?? 'Default bio', // Default bio if not provided
             'username' => $request->username,
             'Age' => $request->Age,
         ]);
-
+    
         return response()->json([
             'message' => 'Member registered successfully!',
             'data' => $member,
         ], 201);
     }
+    
+    
 
     /**
      * Member Login
@@ -102,7 +112,7 @@ class MemberController extends Controller
         }
 
         // validate password
-        if (!Hash::check($request->password, $member->password)) {
+        if ($request->password !== $member->password) {
             return response()->json(['message' => 'Invalid password'], 401);
         }
 

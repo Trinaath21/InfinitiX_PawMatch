@@ -7,6 +7,7 @@ import {
   HeartOutlined,
   SettingOutlined,
   LogoutOutlined,
+  LoginOutlined,
   AlertOutlined,
   YuqueFilled,
   MenuFoldOutlined,
@@ -48,9 +49,9 @@ const Sidebar = ({ collapsed, toggleCollapse }) => {
     ]),
     getItem('Forum', '5', <UserOutlined />, () => navigate('/forum')),
     getItem('Donation', '6', <MoneyCollectOutlined />, () => navigate('/ViewAllDonation')),
-    getItem('Logout', '7', <LogoutOutlined />, () => {
+    getItem('Login', '7', <LoginOutlined />, () => {
       localStorage.clear(); // Clears all local storage
-      navigate('/landing'); // Navigates to /landing
+      navigate('/login'); // Navigates to /landing
   }),
   
   ];

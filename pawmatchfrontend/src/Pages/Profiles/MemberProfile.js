@@ -80,7 +80,7 @@ const MemberProfile = () => {
       >
         <div style={{ textAlign: "center" }}>
           <img
-            src={`http://localhost:8000/storage/${
+            src={`http://localhost:8000${
               profile_picture || "profile-cover.jpg"
             }`}
             alt="Profile"

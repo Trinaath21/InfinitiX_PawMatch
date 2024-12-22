@@ -57,7 +57,7 @@ const ShelterProfile = () => {
     username,
     contact_number,
   } = profile;
-
+  console.log("profile: " + profile_picture);
   return (
     <div className="profile-container" style={{ padding: "20px" }}>
       <Card title="Shelter Profile" style={{ width: 600, margin: "auto" }}>
@@ -121,7 +121,7 @@ const ShelterProfile = () => {
         </Descriptions>
 
         <div style={{ marginTop: 24, textAlign: "center" }}>
-          <Link to="/main/profiles/shelter/edit">
+          <Link to="/profiles/shelter/edit">
             <Button type="primary">Edit Profile</Button>
           </Link>
         </div>

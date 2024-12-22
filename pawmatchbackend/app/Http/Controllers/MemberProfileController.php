@@ -88,8 +88,8 @@ class MemberProfileController extends Controller
                 'phone_number' => $member->phone_number,
                 'NoOfPets' => $member->NoOfPets,
                 'username' => $request->username,
-                'Age' => $request->Age,
-                'bio' => $request->bio,
+                // 'Age' => $request->Age,
+                // 'bio' => $request->bio,
             ]);
         } else {
             // Create new profile if it doesn't exist
