@@ -12,6 +12,7 @@ import {
   Upload,
   Select,
 } from "antd";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
 const stateDistrictData = [
   {
@@ -195,6 +196,9 @@ const EditMemberProfile = () => {
 
   const authToken = localStorage.getItem("login-token");
 
+  const [imageUrl, setImageUrl] = useState(profile?.profile_picture || null);
+  const [uploadLoading, setUploadLoading] = useState(false);
+
   useEffect(() => {
     if (authToken) {
       axios
@@ -245,6 +249,52 @@ const EditMemberProfile = () => {
         setLoading(false);
       });
   };
+
+  const getBase64 = (img, callback) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => callback(reader.result));
+    reader.readAsDataURL(img);
+  };
+
+  const beforeUpload = (file) => {
+    // Check if the file is an image
+    const isImage = file.type.startsWith("image/");
+    if (!isImage) {
+      message.error("Please upload an image file!");
+      return false;
+    }
+
+    // Validate file extension (mimes: jpeg, png, jpg, gif)
+    const isValidFormat = /jpeg|png|jpg|gif/.test(file.type);
+    if (!isValidFormat) {
+      message.error("Only JPEG, PNG, JPG, or GIF formats are allowed!");
+      return false;
+    }
+
+    // Validate file size (max: 2MB or 2048 KB)
+    const maxSize = 2048; // 2MB in KB
+    if (file.size / 1024 > maxSize) {
+      message.error("File size must be less than 2MB!");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleChange = (info) => {
+    if (info.file.status === "uploading") {
+      setUploadLoading(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      getBase64(info.file.originFileObj, (url) => {
+        setUploadLoading(false);
+        setImageUrl(url);
+        message.success("Profile picture uploaded successfully!");
+      });
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -275,10 +325,8 @@ const EditMemberProfile = () => {
           bio: profile.bio,
           phone_number: profile.phone_number,
           state_district: [profile.state, profile.district],
-          //district: profile.district,
           detailed_address: profile.detailed_address,
           NoOfPets: profile.NoOfPets,
-          //  bio: profile.bio || "",
         }}
         onFinish={handleSubmit}
       >
@@ -367,14 +415,69 @@ const EditMemberProfile = () => {
           </Select>
         </Form.Item>
 
+        <Form.Item label="Profile Picture" name="profile_picture">
+          <Upload
+            name="avatar"
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={{
+              showRemoveIcon: true,
+              showPreviewIcon: true,
+            }}
+            onChange={handleChange}
+            onRemove={() => {
+              setImageUrl(null); // 清除已上传的图片
+              return true; // 返回 true 允许移除
+            }}
+            customRequest={({ file, onSuccess }) => {
+              setTimeout(() => {
+                onSuccess("ok");
+              }, 0);
+            }}
+          >
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="avatar"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <div>
+                {uploadLoading ? <LoadingOutlined /> : <PlusOutlined />}
+                <div style={{ marginTop: 8 }}>上传</div>
+              </div>
+            )}
+          </Upload>
+        </Form.Item>
+
         <div style={{ textAlign: "center" }}>
           <Button type="primary" htmlType="submit">
             Save Changes
+          </Button>
+          <Button
+            type="primary"
+            onClick={() => navigate("/main/profiles/member")}
+          >
+            Cancel
           </Button>
         </div>
       </Form>
       {/* ) : (<p>No profile found</p>
       ) */}
+      <style jsx>{`
+        .avatar-uploader > .ant-upload {
+          width: 128px;
+          height: 128px;
+        }
+        .ant-upload-select-picture-card i {
+          font-size: 32px;
+          color: #999;
+        }
+        .ant-upload-select-picture-card .ant-upload-text {
+          margin-top: 8px;
+          color: #666;
+        }
+      `}</style>
     </div>
   );
 };

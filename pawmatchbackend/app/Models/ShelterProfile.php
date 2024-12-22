@@ -8,14 +8,20 @@ use Illuminate\Database\Eloquent\Model;
 class ShelterProfile extends Model
 {
     use HasFactory;
-    protected $table = 'shelter_profiles';
+    protected $table = 'shelter_profile';
 
     protected $fillable = [
         'shelter_id',
-        'profile_picture',
+       // 'website_url',
+        //'description',
         'representative_name',
         'username',
         'contact_number',
+        //'state',
+        //'district',
+        //'detailed_address',
+        //'phone_number',
+        //'NoOfPets'
     ];
 
     // Define the relationship with the Shelter model

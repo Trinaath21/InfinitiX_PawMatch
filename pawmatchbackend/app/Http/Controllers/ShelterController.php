@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
-
+use Illuminate\Support\Facades\Password;
 class ShelterController extends Controller
 {
     use HasApiTokens;
@@ -25,8 +25,12 @@ class ShelterController extends Controller
             'email' => 'required|email|unique:shelter,email',
             'password' => 'required|string|min:6',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            //'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'website_url' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
+          //  'representative_name' => 'nullable|string|max:255',
+          //  'username' => 'nullable|string|max:255',
+          //  'contact_number' => 'nullable|string|max:15',
         ]);
 
         if ($validator->fails()) {
@@ -53,7 +57,7 @@ class ShelterController extends Controller
             'NoOfPets' => $request->NoOfPets,
             'phone_number' => $request->phone_number,
             'email' => $request->email,
-            'password' => $request->password,
+            'password' => Hash::make($request->password),
             'profile_picture' => $imagePath,
             'website_url' => $request->website_url,
             'description' => $request->description,
@@ -62,16 +66,12 @@ class ShelterController extends Controller
             'contact_number' => $request->contact_number,
         ]);
         $shelter->profile()->create([
-             'representative_name' => $request->shelter_name,
-              'username' => $request->username ?? "",
-              'contact_number' => $request->phone_number,
+             'representative_name' => $request->representative_name,
+              'username' => $request->username,
+              'contact_number' => $request->contact_number,
         
         ]);
-       /* $shelter->profile()->create([
-        'representative_name' => $request->representative_name,
-        'username' => $request->username,
-        'contact_number' => $request->contact_number,
-        ]); */
+
         return response()->json([
             'message' => 'Shelter registered successfully!',
             'data' => $shelter,
@@ -97,9 +97,8 @@ class ShelterController extends Controller
         if (!$shelter) {
             return response()->json(['message' => 'Shelter not found'], 404);
         }
-
-        if ($request->password !== $shelter->password) {
-            return response()->json(['message' => 'Invalid password'], 401);
+        if (!Hash::check($request->password, $shelter->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
         $token = $shelter->createToken('ShelterLoginToken')->plainTextToken;

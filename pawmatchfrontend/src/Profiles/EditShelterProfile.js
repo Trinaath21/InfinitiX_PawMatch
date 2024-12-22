@@ -11,7 +11,9 @@ import {
   message,
   Tag,
   Select,
+  Upload,
 } from "antd";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
 const stateDistrictData = [
   {
@@ -194,6 +196,10 @@ const EditShelterProfile = () => {
 
   const authToken = localStorage.getItem("ShelterLoginToken");
   // Fetch shelter profile data
+  const [uploadLoading, setUploadLoading] = useState(false);
+
+  const [imageUrl, setImageUrl] = useState(profile?.profile_picture || null);
+
   useEffect(() => {
     if (authToken) {
       axios
@@ -204,6 +210,11 @@ const EditShelterProfile = () => {
         })
         .then((response) => {
           setProfile(response.data.profile);
+          if (response.data.profile.profile_picture) {
+            setImageUrl(
+              `http://localhost:8000/storage/${response.data.profile.profile_picture}`
+            );
+          }
           setLoading(false);
         })
         .catch((err) => {
@@ -245,6 +256,37 @@ const EditShelterProfile = () => {
         setLoading(false);
       });
   };
+  const getBase64 = (img, callback) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => callback(reader.result));
+    reader.readAsDataURL(img);
+  };
+
+  const beforeUpload = (file) => {
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+    if (!isJpgOrPng) {
+      message.error("Only JPG/PNG format images are allowed!");
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error("Image must be less than 2MB!");
+    }
+    return isJpgOrPng && isLt2M;
+  };
+
+  const handleChange = (info) => {
+    if (info.file.status === "uploading") {
+      setUploadLoading(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      getBase64(info.file.originFileObj, (url) => {
+        setUploadLoading(false);
+        setImageUrl(url);
+        message.success("Profile picture uploaded successfully!");
+      });
+    }
+  };
 
   // Loading state
   if (loading) {
@@ -285,19 +327,47 @@ const EditShelterProfile = () => {
         }}
         onFinish={handleSubmit}
       >
+        <Form.Item label="Profile Picture" name="profile_picture">
+          <Upload
+            name="avatar"
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            beforeUpload={beforeUpload}
+            onChange={handleChange}
+            customRequest={({ file, onSuccess }) => {
+              setTimeout(() => {
+                onSuccess("ok");
+              }, 0);
+            }}
+          >
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="avatar"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
+            ) : (
+              <div>
+                {uploadLoading ? <LoadingOutlined /> : <PlusOutlined />}
+                <div style={{ marginTop: 8 }}>Upload</div>
+              </div>
+            )}
+          </Upload>
+        </Form.Item>
         <Form.Item label="Shelter Name" name="shelter_name">
           <Input placeholder="Enter shelter name" />
         </Form.Item>
         <Form.Item label="Representative Name" name="representative_name">
           <Input placeholder="Enter representative name" />
         </Form.Item>
-
+        {/* 
         <Form.Item label="Username" name="username">
           <Input placeholder="Enter username" />
         </Form.Item>
-
+ */}
         <Form.Item
-          label="Phone Number"
+          label="Shelter Contact Number"
           name="phone_number"
           rules={[
             { required: false, message: "Please input your phone number!" },
@@ -310,7 +380,7 @@ const EditShelterProfile = () => {
           <Input addonBefore={prefixSelector} />
         </Form.Item>
         <Form.Item
-          label="Contact Number"
+          label="Representative Contact Number"
           name="contact_number"
           rules={[
             {
@@ -392,6 +462,20 @@ const EditShelterProfile = () => {
           </Button>
         </div>
       </Form>
+      <style jsx>{`
+        .avatar-uploader > .ant-upload {
+          width: 128px;
+          height: 128px;
+        }
+        .ant-upload-select-picture-card i {
+          font-size: 32px;
+          color: #999;
+        }
+        .ant-upload-select-picture-card .ant-upload-text {
+          margin-top: 8px;
+          color: #666;
+        }
+      `}</style>
     </div>
   );
 };

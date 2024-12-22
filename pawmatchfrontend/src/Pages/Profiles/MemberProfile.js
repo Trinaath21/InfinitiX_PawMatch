@@ -95,8 +95,6 @@ const MemberProfile = () => {
         </div>
 
         <Descriptions title="Member Information" bordered column={1}>
-          {/*<Descriptions.Item label="Member Name">{name}</Descriptions.Item>*/}
-
           <Descriptions.Item label="Username">
             {username ? username : <Tag color="warning">Null</Tag>}
           </Descriptions.Item>
@@ -124,7 +122,6 @@ const MemberProfile = () => {
           <Descriptions.Item label="Number of Pets">
             {NoOfPets}
           </Descriptions.Item>
-          {/* <Descriptions.Item label="Age">{Age}</Descriptions.Item> */}
         </Descriptions>
 
         <div style={{ marginTop: 24, textAlign: "center" }}>
