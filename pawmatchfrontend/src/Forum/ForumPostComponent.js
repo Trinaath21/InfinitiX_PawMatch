@@ -71,7 +71,7 @@ useEffect(() => {
   const fetchAllPosts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8000/posts');
+      const response = await axios.get('http://localhost:8000/api/posts');
       const postsData = response.data.map(post => ({
         ...post,
         images: Array.isArray(post.images) ? post.images : JSON.parse(post.images || "[]")
@@ -90,8 +90,24 @@ useEffect(() => {
   const fetchMyPosts = async () => {
     setLoading(true);
     try {
-      const userId = 1;
-      const response = await axios.get('http://localhost:8000/user/posts/1'); // Replace with your actual API endpoint
+     // const userId = 1;
+      //const response = await axios.get('http://localhost:8000/user/posts/1'); // Replace with your actual API endpoint
+      // Example: Fetch the current user's role and ID
+      const currentUser = { role: localStorage.getItem('role'), id: 1, shelter_id: 1}; // Replace with actual user context
+      let endpoint;
+
+      // Determine the API endpoint based on the role
+      if (currentUser.role === 'member') {
+          endpoint = `http://localhost:8000/api/member/posts/${currentUser.id}`;
+      } else if (currentUser.role === 'shelter') {
+          endpoint = `http://localhost:8000/api/shelter/posts/${currentUser.shelter_id}`;
+      } else {
+          console.error('Unknown user role');
+          setLoading(false);
+          return;
+      }
+
+      const response = await axios.get(endpoint); // Fetch posts based on the role
       const postsData = response.data.map(post => ({
         ...post,
         images: Array.isArray(post.images) ? post.images : JSON.parse(post.images || "[]")
@@ -216,7 +232,20 @@ const UserPostModal = ({
   // Fetch user's posts from the API
   const fetchUserPosts = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/user/posts/1"); // Temporary user_id: 1
+
+      const currentUser = { role: localStorage.getItem('role'),  id: 1, shelter_id: 1 };
+      let endpoint;
+      //const response = await axios.get("http://localhost:8000/user/posts/1"); // Temporary user_id: 1
+      // Determine the API endpoint based on the user's role
+      if (currentUser.role === 'member') {
+        endpoint = `http://localhost:8000/api/member/posts/${currentUser.id}`;
+    } else if (currentUser.role === 'shelter') {
+        endpoint = `http://localhost:8000/api/shelter/posts/${currentUser.shelter_id}`;
+    } else {
+        throw new Error("Invalid user role");
+    }
+    const response = await axios.get(endpoint); // Fetch posts from the API
+
       setUserPosts(response.data);
       setIsEditListVisible(true);
     } catch (error) {
@@ -241,7 +270,7 @@ const UserPostModal = ({
       setIsEditListVisible(false);
 
        // Fetch post data
-      const response = await axios.get(`http://localhost:8000/posts/${post_id}`);
+      const response = await axios.get(`http://localhost:8000/api/posts/${post_id}`);
       const postData = response.data;
 
       // Ensure imagesArray is correctly parsed as an array
@@ -317,18 +346,18 @@ const handleSubmit = async () => {
             console.log(`${key}:`, value);
         }  
 
-        const url = isEditing ? `http://localhost:8000/posts/${currentPostId}` : 'http://localhost:8000/posts';
+        const url = isEditing ? `http://localhost:8000/api/posts/${currentPostId}` : 'http://localhost:8000/api/posts';
         const method = isEditing ? 'post' : 'post';
-       // const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        //const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const userRole = localStorage.getItem('role'); 
         if (userRole == "shelter"){
           formData.append("shelter_id",1);
-          formData.append("user_id",1);
+         // formData.append("user_id",1);
           formData.append("role",userRole);
         }
         else if (userRole == "member"){
           formData.append("member_id",1);
-          formData.append("user_id",1);
+         // formData.append("user_id",1);
           formData.append("role",userRole);
         }          
         
@@ -344,7 +373,7 @@ const handleSubmit = async () => {
                // 'X-CSRF-TOKEN': csrfToken,
                 'Content-Type': 'multipart/form-data',
             },
-            //withCredentials: true,  // Ensures cookies are sent with cross-origin requests
+           // withCredentials: true,  // Ensures cookies are sent with cross-origin requests
         });
 
         notification.success({ message: isEditing ? 'Post updated successfully!' : 'Post created successfully!' });
@@ -656,6 +685,7 @@ const handleSubmit = async () => {
 };
 
 export default ContentComponent;
+
 
 
 
