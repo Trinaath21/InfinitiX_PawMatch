@@ -24,7 +24,9 @@ import PersonalStrayListings from '../Stray/PersonalStrayListings';
 import ViewMoreStrayDetails from '../Stray/ViewMoreStrayDetails';
 // Forum
 import PostDetails from '../Forum/PostDetails.js';
-import ContentComponent from '../Forum/ForumPostComponent.js';
+import ForumPostComponent from '../Forum/ForumPostComponent.js';
+import MyPostComponent from '../Forum/MyPosts.js';
+
 
 //User Management
 import Login from '../Pages/Login/index.js';
@@ -121,7 +123,8 @@ const ContentArea = () => {
             <Route path="/PersonalStrayListings" element={<PersonalStrayListings />} />
 
             {/* Forum Routes */}
-            <Route path="/forum" element={<ContentComponent />} />
+            <Route path="/forum" element={<ForumPostComponent />} />
+            <Route path="/forum/myPost" element={<MyPostComponent />} />
             <Route path="/post/:post_id" element={<PostDetails />} />
           </Routes>
         </Content>
