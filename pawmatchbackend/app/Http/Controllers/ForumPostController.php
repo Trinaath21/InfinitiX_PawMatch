@@ -112,6 +112,28 @@ class ForumPostController extends Controller
     }
     return response()->json($posts, 200);
 }
+
+public function getMemberPosts($member_id)
+{
+    $posts = ForumPost::where('member_id', $member_id)->select('post_id', 'title', 'content', 'images', 'created_at','updated_at')->orderBy('updated_at', 'desc')->withCount('comments')->get();
+    
+    if ($posts->isEmpty()) {
+        return response()->json(['message' => 'No posts available'], 200);
+    }
+    return response()->json($posts, 200);
+}
+
+public function getShelterPosts($shelter_id)
+{
+    $posts = ForumPost::where('shelter_id', $shelter_id)->select('post_id', 'title', 'content', 'images', 'created_at','updated_at')->orderBy('updated_at', 'desc')->withCount('comments')->get();
+    
+    if ($posts->isEmpty()) {
+        return response()->json(['message' => 'No posts available'], 200);
+    }
+    return response()->json($posts, 200);
+}
+
+
     // Fetch all posts
     public function index()
     {
