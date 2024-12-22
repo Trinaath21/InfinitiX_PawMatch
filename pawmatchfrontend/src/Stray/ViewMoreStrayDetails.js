@@ -108,7 +108,7 @@ const ViewMoreStrayDetails = () => {
 
       <Row gutter={[0, 16]} style={{ borderBottom: '1px solid #ccc', padding: '10px 0' }}>
         <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
-          <Text><strong>Creator Phone Number:</strong> {caseInfo.user.phoneNumber}</Text>
+          <Text><strong>Creator Phone Number:</strong> {caseInfo.user.phone_number}</Text>
         </Col>
         {/* <Col xs={24} sm={12} style={{ padding: '0 16px' }}>
           <Text><strong>Reply Reports Quantity:</strong> {caseInfo.noOfReplies}</Text>

@@ -180,7 +180,7 @@ const AddStrayReport = ({ visible, onClose,refreshTableData }) => {
         onSubmit: async (values) => {
             //console.log("hi");
             const formData = new FormData();
-            formData.append('user_id', '2'); // Replace with actual user_id if available
+            formData.append('user_id', '1'); // Replace with actual user_id if available
             formData.append('breed', values.breed);
             formData.append('colour', values.colour);
             formData.append('status', values.status);

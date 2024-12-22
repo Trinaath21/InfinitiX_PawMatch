@@ -121,7 +121,7 @@ const ShelterProfile = () => {
         </Descriptions>
 
         <div style={{ marginTop: 24, textAlign: "center" }}>
-          <Link to="/main/profiles/shelter/edit">
+          <Link to="/profiles/shelter/edit">
             <Button type="primary">Edit Profile</Button>
           </Link>
         </div>

@@ -25,14 +25,14 @@ class Member extends Model
         'email',
         'profile_picture',
         'password',
-       // 'username',
-        //'Age',
-        //'bio',
+        'username',
+        'Age',
+        'bio',
     ];
 
     // 定义与 MemberProfile 模型的关系，使用 member_id 作为外键
     public function profile()
     {
-        return $this->hasOne(MemberProfile::class, 'member_id', 'user_id'); // 外键是 member_id，关联主键是 user_id
+        return $this->hasOne(MemberProfile::class, 'user_id', 'user_id'); // 外键是 member_id，关联主键是 user_id
     }
 }

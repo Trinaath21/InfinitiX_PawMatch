@@ -10,7 +10,7 @@ class AdoptionApplication extends Model
     use HasFactory;
 
     // Define the table name if it doesn't follow the default Laravel naming convention
-    protected $table = 'adoptionapplications';
+    protected $table = 'adoptionapplication';
 
     // Specify the primary key if it's not `id`
     protected $primaryKey = 'application_id';

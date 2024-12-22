@@ -13,6 +13,7 @@ use App\Http\Controllers\MemberProfileController;
 use App\Http\Controllers\ShelterProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -38,7 +39,7 @@ Route::post('/rejectReplyReport', [LostFoundController::class, 'rejectReplyRepor
 Route::post('/posts', [ForumPostController::class, 'store'])->withoutMiddleware([VerifyCsrfToken::class]);
 Route::get('/posts', [ForumPostController::class, 'index']);
 Route::get('/posts/{post_id}', [ForumPostController::class, 'show']);
-Route::post('/posts/{post_id}', [ForumPostController::class, 'update']);
+Route::post('/posts/{post_id}', [ForumPostController::class, 'update'])->withoutMiddleware([VerifyCsrfToken::class]);
 Route::get('/user/posts/{user_id}', [ForumPostController::class, 'getUserPosts']);
 Route::delete('/posts/{post_id}', [ForumPostController::class, 'destroy']);
 Route::get('/posts/{post_id}/comments', [ForumPostController::class,'getComments']);

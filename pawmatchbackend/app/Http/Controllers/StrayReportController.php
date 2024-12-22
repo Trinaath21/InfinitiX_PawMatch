@@ -79,11 +79,12 @@ class StrayReportController extends Controller
             $excludedUserId = $request->input('user_id'); // Assuming 'user_id' is sent in the request
 
             $reports = DB::table('strayanimalreport')
-                ->join('member', 'strayanimalreport.user_id', '=', 'member.user_id')
-                ->where('strayanimalreport.status', 'active')
-                ->where('strayanimalreport.user_id', '!=', $excludedUserId)
-                ->select('strayanimalreport.*', 'member.*') // Fetches all fields from both tables
-                ->get();
+            ->join('member', 'strayanimalreport.user_id', '=', 'member.user_id')
+            ->where('strayanimalreport.status', 'active')
+            ->where('strayanimalreport.user_id', '!=', $excludedUserId)
+            ->select('strayanimalreport.*', 'member.*', 'strayanimalreport.district') // Explicitly include district
+            ->get();
+        
             
             
         
@@ -230,7 +231,7 @@ class StrayReportController extends Controller
                     'member.user_id as user_id',
                     'member.name as name',
                     'member.email as email',
-                    'member.phoneNumber as phoneNumber',
+                    'member.phone_number as phone_number',
                     
                     // Pet information (from reportlostfound table)
                     'strayanimalreport.breed',
@@ -303,7 +304,7 @@ class StrayReportController extends Controller
                 'user' => [
                     'name' => $report->name,
                     'email' => $report->email,
-                    'phoneNumber' => $report->phoneNumber,
+                    'phone_number' => $report->phone_number,
                     'user_id' => $report->user_id,
                 ],
     

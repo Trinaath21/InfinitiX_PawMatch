@@ -290,8 +290,6 @@ const UserPostModal = ({
 };
 
 
-
-  // Handle form submission for creating or updating a post
 const handleSubmit = async () => {
     try {
         const values = await form.validateFields();
@@ -321,7 +319,21 @@ const handleSubmit = async () => {
 
         const url = isEditing ? `http://localhost:8000/posts/${currentPostId}` : 'http://localhost:8000/posts';
         const method = isEditing ? 'post' : 'post';
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        //const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const userRole = localStorage.getItem('role'); 
+        if (userRole == "shelter"){
+          formData.append("shelter_id",1);
+          formData.append("user_id",1);
+          formData.append("role",userRole);
+        }
+        else if (userRole == "member"){
+          formData.append("member_id",1);
+          formData.append("user_id",1);
+          formData.append("role",userRole);
+        }          
+        
+        //console.log("token: " + csrfToken);
+     
       
 
         await axios({
@@ -329,10 +341,10 @@ const handleSubmit = async () => {
             url,
             data: formData,
             headers: {
-                'X-CSRF-TOKEN': csrfToken,
+               // 'X-CSRF-TOKEN': csrfToken,
                 'Content-Type': 'multipart/form-data',
             },
-            withCredentials: true,  // Ensures cookies are sent with cross-origin requests
+           // withCredentials: true,  // Ensures cookies are sent with cross-origin requests
         });
 
         notification.success({ message: isEditing ? 'Post updated successfully!' : 'Post created successfully!' });
@@ -350,6 +362,7 @@ const handleSubmit = async () => {
         notification.error({ message: 'Failed to submit the post.' });
     }
 };
+
   
 
   // Handle content change in TinyMCE editor

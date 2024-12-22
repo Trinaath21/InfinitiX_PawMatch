@@ -124,11 +124,11 @@ const MemberProfile = () => {
           <Descriptions.Item label="Number of Pets">
             {NoOfPets}
           </Descriptions.Item>
-          <Descriptions.Item label="Age">{Age}</Descriptions.Item>
+          {/* <Descriptions.Item label="Age">{Age}</Descriptions.Item> */}
         </Descriptions>
 
         <div style={{ marginTop: 24, textAlign: "center" }}>
-          <Link to="/main/profiles/member/edit">
+          <Link to="/profiles/member/edit">
             <Button type="primary">Edit Profile</Button>
           </Link>
         </div>

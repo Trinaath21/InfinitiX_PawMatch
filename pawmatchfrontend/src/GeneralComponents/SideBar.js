@@ -13,6 +13,7 @@ import {
   MenuUnfoldOutlined,
   UserOutlined,
   MoneyCollectOutlined,
+  DesktopOutlined
 } from '@ant-design/icons';
 
 const { Sider } = Layout;

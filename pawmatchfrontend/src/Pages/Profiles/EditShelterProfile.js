@@ -236,7 +236,7 @@ const EditShelterProfile = () => {
       })
       .then((response) => {
         message.success("Shelter profile updated successfully!");
-        navigate("/main/profiles/shelter");
+        navigate("/profiles/shelter");
       })
       .catch((err) => {
         message.error(
@@ -387,7 +387,7 @@ const EditShelterProfile = () => {
           <Button type="primary" htmlType="submit">
             Save Changes
           </Button>
-          <Button onClick={() => navigate("/main/profiles/shelter")}>
+          <Button onClick={() => navigate("/profiles/shelter")}>
             Cancel
           </Button>
         </div>

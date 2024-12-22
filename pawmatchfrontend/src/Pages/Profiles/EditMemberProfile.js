@@ -236,7 +236,7 @@ const EditMemberProfile = () => {
       .then((response) => {
         message.success("Member Profile updated successfully!");
         //setProfile(response.data.profile);
-        navigate("/main/profiles/member");
+        navigate("/profiles/member");
       })
       .catch((err) => {
         message.error(

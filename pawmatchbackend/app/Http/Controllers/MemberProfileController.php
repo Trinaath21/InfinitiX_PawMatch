@@ -35,9 +35,9 @@ class MemberProfileController extends Controller
                 'detailed_address' => $member->detailed_address,
                 'NoOfPets' => $member->NoOfPets,
                 'profile_picture' => $member->profile_picture, 
-                'username' => $member->profile->username,
-                'Age' => $member->profile->Age,
-                'bio' => $member->profile->bio,  
+                // 'username' => $member->profile->username,
+                // 'Age' => $member->profile->Age,
+                // 'bio' => $member->profile->bio,  
 
             ]
         ], 200);
@@ -100,17 +100,17 @@ class MemberProfileController extends Controller
                 'detailed_address' => $member->detailed_address,
                 'phone_number' => $member->phone_number,
                 'NoOfPets' => $member->NoOfPets, 
-              'username' => $request->username,
-              'Age' => $request->Age,
-              'bio' => $request->bio,
+            //   'username' => $request->username,
+            //   'Age' => $request->Age,
+            //   'bio' => $request->bio,
             ])->save();
         } else {
             MemberProfile::create([
-                'member_id' => $member->id,
+                'user_id' => $member->user_id,
                 'profile_picture' => $validated['profile_picture'] ?? null,
-                'username' => $request->member_profiles->username,
-                'Age' => $request->member_profiles->Age,
-                'bio' => $request->member_profiles->bio,
+                // 'username' => $request->member_profiles->username,
+                // 'Age' => $request->member_profiles->Age,
+                // 'bio' => $request->member_profiles->bio,
             ]);
         }
     
@@ -125,9 +125,9 @@ class MemberProfileController extends Controller
                 'detailed_address' => $member->detailed_address,
                 'NoOfPets' => $member->NoOfPets,
                 'profile_picture' => $member->profile_picture,
-                'username' => $member->profile->username,
-                'Age' => $member->profile->Age,
-                'bio' => $member->profile->bio, 
+                // 'username' => $member->profile->username,
+                // 'Age' => $member->profile->Age,
+                // 'bio' => $member->profile->bio, 
 
 
             ]

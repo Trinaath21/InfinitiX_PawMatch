@@ -53,13 +53,13 @@ class ShelterController extends Controller
             'NoOfPets' => $request->NoOfPets,
             'phone_number' => $request->phone_number,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'profile_picture' => $imagePath,
             'website_url' => $request->website_url,
             'description' => $request->description,
-            // 'representative_name' => $request->representative_name,
-            // 'username' => $request->username,
-            // 'contact_number' => $request->contact_number,
+            'representative_name' => $request->representative_name,
+            'username' => $request->username,
+            'contact_number' => $request->contact_number,
         ]);
         $shelter->profile()->create([
              'representative_name' => $request->shelter_name,
@@ -97,8 +97,9 @@ class ShelterController extends Controller
         if (!$shelter) {
             return response()->json(['message' => 'Shelter not found'], 404);
         }
-        if (!Hash::check($request->password, $shelter->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+
+        if ($request->password !== $shelter->password) {
+            return response()->json(['message' => 'Invalid password'], 401);
         }
 
         $token = $shelter->createToken('ShelterLoginToken')->plainTextToken;

@@ -31,6 +31,16 @@ class ForumPost extends Model
     {
         return $this->belongsTo(User::class,'user_id');
     }
+
+    public function shelter()
+    {
+        return $this->belongsTo(Shelter::class, 'shelter_id');
+    }
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class, 'member_id');
+    }
 }
 
 ?>

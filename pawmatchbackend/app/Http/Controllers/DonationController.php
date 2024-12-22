@@ -95,7 +95,7 @@ class DonationController extends Controller
 
     public function fetchShelters()
     {
-        $shelter = \App\Models\Shelter::select('shelter_id', 'shelter_name', 'phone_number', 'description', 'address', 'district', 'state')->get();
+        $shelter = \App\Models\Shelter::select('shelter_id', 'shelter_name', 'phone_number', 'description', 'detailed_address', 'district', 'state')->get();
         //Log::info('Shelters Data:', $shelter->toArray());
         return response()->json($shelter, 200);
     }

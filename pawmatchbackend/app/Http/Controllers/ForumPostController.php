@@ -21,7 +21,36 @@ class ForumPostController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'images.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // Validate each image file
-        ]);
+        ]); 
+
+        // Determine user type and assign ownership
+     $user_id = $request->input("user_id");
+     $userRole = $request->input("role");
+     if ($userRole == "shelter"){
+        $shelter_id = $request->input("shelter_id");
+      }
+      else if ($userRole == "member"){
+        $member_id = $request->input("member_id");
+      }        
+    //  $member_id = $request->input("member_id");
+    //  $shelter_id = $request->input("shelter_id");
+     // Initialize ownership variables
+     //$role = null;
+     //$shelter_id = null;
+     //$member_id = null;
+
+     
+     if (isset($shelter_id)) {
+        //$role = 'shelter';
+       // $shelter_id = $shelter_id;
+        $member_id = null;
+    } else if (isset($member_id)) {
+        //$role = 'member';
+        $shelter_id = null;
+        //$member_id = $id;
+    } else {
+        return response()->json(['error' => 'Invalid user type'], 403);
+    }
 
         // Store images and collect paths
         $imagePaths = [];
@@ -32,12 +61,6 @@ class ForumPostController extends Controller
                 $path = $image->store('images','public');
                 $imagePaths[] = Storage::url($path);
             } 
-           /* foreach ($request->file('images') as $image) {
-                $path = $image->store('public/images'); // Store in 'public/images' directory
-                //$path = $image->store('images','public'); 
-                $imagePaths[] = Storage::url($path); // Store the public URL path
-                //$imagePaths[] = $path;
-            }*/
         
         // Log image paths for debugging
         Log::info('Image paths:', $imagePaths);
@@ -51,6 +74,9 @@ class ForumPostController extends Controller
             'content' => $validatedData['content'],
             'images' => $imagePaths, // Save array of image paths
             'user_id' => 1, // Temporarily set a user ID
+            'shelter_id' => null,
+            'member_id' => null,
+           // 'role' => $role,
         ]);
 
         Log::info('Post created with images:', $post->toArray());

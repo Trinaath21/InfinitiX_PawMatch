@@ -14,7 +14,7 @@ class MemberProfile extends Model
     public $timestamps = false; // 如果没有时间戳字段
 
     protected $fillable = [
-        'member_id',  // 外键字段
+        'user_id',  // 外键字段
         'bio',
         'username',
         'Age',
@@ -22,7 +22,7 @@ class MemberProfile extends Model
 
     // 定义与 Member 模型的关系
     public function member()
-    {
-        return $this->belongsTo(Member::class, 'member_id', 'user_id'); // 使用 member_id 和 user_id 来建立关联
+    {   return $this->belongsTo(Member::class);
+        //return $this->belongsTo(Member::class, 'member_id', 'user_id'); // 使用 member_id 和 user_id 来建立关联
     }
 }

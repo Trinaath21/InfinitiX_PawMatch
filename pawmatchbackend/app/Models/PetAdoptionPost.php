@@ -10,7 +10,7 @@ class PetAdoptionPost extends Model
     use HasFactory;
 
     // Define the table name if it doesn't follow the default Laravel naming convention
-    protected $table = 'petadoptionposts';
+    protected $table = 'petadoptionpost';
 
     // Specify the primary key if it's not `id`
     protected $primaryKey = 'adoption_post_id';
