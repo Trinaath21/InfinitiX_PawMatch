@@ -15,7 +15,7 @@ class ForumPost extends Model
     protected $primaryKey = 'post_id';
 
     // Specify fillable fields, including user_id
-    protected $fillable = ['title', 'content', 'images', 'user_id'];
+    protected $fillable = ['title', 'content', 'images', 'shelter_id','member_id'];
 
     protected $casts = [
         'images' => 'array', // Cast images as an array
@@ -27,10 +27,10 @@ class ForumPost extends Model
     }
 
     // Define the relationship to User
-    public function user()
+   /* public function user()
     {
         return $this->belongsTo(User::class,'user_id');
-    }
+    }*/
 
     public function shelter()
     {
