@@ -20,7 +20,7 @@ class AdoptionApplicationController extends Controller
 
         // Fetch the user's address details from the `member` table
         $member = Member::select('detailed_address', 'district', 'state')
-            ->where('id', $id)
+            ->where('user_id', $id)
             ->first();
 
         if (!$member) {

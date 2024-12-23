@@ -11,7 +11,10 @@ import {
   message,
   Upload,
   Select,
+  Modal,
 } from "antd";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import "./EditMemberProfile.css";
 
 const stateDistrictData = [
   {
@@ -187,13 +190,16 @@ const EditMemberProfile = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const prefixSelector = (
-    <Select defaultValue="06" style={{ width: 70 }}>
-      <Select.Option value="06">06</Select.Option>
+    <Select defaultValue="60" style={{ width: 70 }}>
+      <Select.Option value="60">60</Select.Option>
       <Select.Option value="86">86</Select.Option>
     </Select>
   );
 
   const authToken = localStorage.getItem("login-token");
+
+  const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] =
+    useState(false);
 
   useEffect(() => {
     if (authToken) {
@@ -236,7 +242,7 @@ const EditMemberProfile = () => {
       .then((response) => {
         message.success("Member Profile updated successfully!");
         //setProfile(response.data.profile);
-        navigate("/profiles/member");
+        navigate("/main/profiles/member");
       })
       .catch((err) => {
         message.error(
@@ -245,6 +251,25 @@ const EditMemberProfile = () => {
         setLoading(false);
       });
   };
+
+  const handleChangePassword = (values) => {
+    axios
+      .post("http://localhost:8000/api/member/change-password", values, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
+      .then((response) => {
+        message.success("Password changed successfully");
+        setIsChangePasswordModalVisible(false);
+      })
+      .catch((error) => {
+        message.error(
+          error.response?.data?.message || "Password change failed"
+        );
+      });
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -266,8 +291,10 @@ const EditMemberProfile = () => {
   }
 
   return (
-    <div style={{ padding: "20px", maxWidth: 800, margin: "auto" }}>
+    <div className="edit-profile-container">
+      <h2>Edit Profile</h2>
       <Form
+        className="edit-profile-form"
         layout="vertical"
         initialValues={{
           username: profile.username,
@@ -275,17 +302,15 @@ const EditMemberProfile = () => {
           bio: profile.bio,
           phone_number: profile.phone_number,
           state_district: [profile.state, profile.district],
-          //district: profile.district,
           detailed_address: profile.detailed_address,
           NoOfPets: profile.NoOfPets,
-          //  bio: profile.bio || "",
         }}
         onFinish={handleSubmit}
       >
         <Form.Item
           label="User Name"
           name="username"
-          rules={[{ required: false, message: "Please input new username!" }]}
+          rules={[{ required: true, message: "Please input new username!" }]}
         >
           <Input />
         </Form.Item>
@@ -294,7 +319,7 @@ const EditMemberProfile = () => {
           label="Phone Number"
           name="phone_number"
           rules={[
-            { required: false, message: "Please input your phone number!" },
+            { required: true, message: "Please input your phone number!" },
             {
               pattern: /^\d{6,}$/,
               message: "Phone number must be at least 6 digits.",
@@ -309,7 +334,7 @@ const EditMemberProfile = () => {
           label="State and District"
           rules={[
             {
-              required: false,
+              required: true,
               message: "Please select your state and district!",
             },
           ]}
@@ -321,7 +346,7 @@ const EditMemberProfile = () => {
           label="Detailed Address"
           rules={[
             {
-              required: false,
+              required: true,
               message: "Please input your detailed address!",
             },
           ]}
@@ -333,7 +358,7 @@ const EditMemberProfile = () => {
           label="Number of Pets"
           rules={[
             {
-              required: false,
+              required: true,
             },
           ]}
         >
@@ -343,7 +368,7 @@ const EditMemberProfile = () => {
         <Form.Item
           name="Age"
           label="Age"
-          rules={[{ required: false, message: "Please input your age!" }]}
+          rules={[{ required: true, message: "Please input your age!" }]}
         >
           <InputNumber min={0} style={{ width: "100%" }} />
         </Form.Item>
@@ -351,25 +376,123 @@ const EditMemberProfile = () => {
         <Form.Item
           name="bio"
           label="Gender"
-          rules={[{ required: false, message: "Please select your gender!" }]}
+          rules={[{ required: true, message: "Please select your gender!" }]}
         >
           <Select placeholder="Select your gender">
             <Select.Option value="Male">Male</Select.Option>
             <Select.Option value="Female">Female</Select.Option>
+            <Select.Option value="Others">Others</Select.Option>
             <Select.Option value="Prefer not to say">
               Prefer not to say
             </Select.Option>
           </Select>
         </Form.Item>
 
-        <div style={{ textAlign: "center" }}>
+        <div className="button-group">
           <Button type="primary" htmlType="submit">
             Save Changes
           </Button>
+          <Button onClick={() => navigate("/main/profiles/member")}>
+            Cancel
+          </Button>
         </div>
       </Form>
-      {/* ) : (<p>No profile found</p>
-      ) */}
+
+      <div className="change-password-button">
+        <Button
+          type="primary"
+          onClick={() => setIsChangePasswordModalVisible(true)}
+        >
+          Change Password
+        </Button>
+      </div>
+
+      <Modal
+        title="Change Password"
+        open={isChangePasswordModalVisible}
+        onCancel={() => setIsChangePasswordModalVisible(false)}
+        footer={null}
+      >
+        <Form layout="vertical" onFinish={handleChangePassword}>
+          <Form.Item
+            name="current_password"
+            label="Current Password"
+            rules={[
+              { required: true, message: "Please input current password" },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="new_password"
+            label="New Password"
+            rules={[
+              { required: true, message: "Please input new password" },
+              { min: 6, message: "Password must be at least 6 characters" },
+              {
+                pattern:
+                  /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,}$/,
+                message:
+                  "Password must contain at least one uppercase letter, one symbol, and one number.",
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="confirm_password"
+            label="Confirm New Password"
+            dependencies={["new_password"]}
+            rules={[
+              { required: true, message: "Please confirm new password" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("new_password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error(
+                      "The two passwords that you entered do not match."
+                    )
+                  );
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item style={{ textAlign: "right", marginBottom: 0 }}>
+            <Button
+              type="default"
+              style={{ marginRight: 8 }}
+              onClick={() => setIsChangePasswordModalVisible(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Confirm
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      <style jsx>{`
+        .avatar-uploader > .ant-upload {
+          width: 128px;
+          height: 128px;
+        }
+        .ant-upload-select-picture-card i {
+          font-size: 32px;
+          color: #999;
+        }
+        .ant-upload-select-picture-card .ant-upload-text {
+          margin-top: 8px;
+          color: #666;
+        }
+      `}</style>
     </div>
   );
 };

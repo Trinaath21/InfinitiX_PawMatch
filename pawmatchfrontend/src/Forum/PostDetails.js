@@ -31,10 +31,10 @@ const PostDetails = () => {
   const fetchPostAndComments = async () => {
     setLoading(true);
     try {
-      const postResponse = await axios.get(`http://localhost:8000/posts/${post_id}`);
+      const postResponse = await axios.get(`http://localhost:8000/api/posts/${post_id}`);
       setPost(postResponse.data);
 
-      const commentsResponse = await axios.get(`http://localhost:8000/posts/${post_id}/comments`);
+      const commentsResponse = await axios.get(`http://localhost:8000/api/posts/${post_id}/comments`);
       setComments(commentsResponse.data);
     } catch (error) {
       console.error("Error fetching post or comments:", error);
@@ -64,7 +64,7 @@ const PostDetails = () => {
     try {
       const token = localStorage.getItem('authToken'); // Get the auth token
       const userRole = localStorage.getItem('role'); // Get the user role from local storage
-      const memberId = localStorage.getItem('member_id');
+      const memberId = localStorage.getItem('user_id');
       const shelterId = localStorage.getItem('shelter_id');
 console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId);
      /* const response = await axios.post(
@@ -99,6 +99,7 @@ console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId)
       setComments((prevComments) => [...prevComments, response.data]);
       setNewComment(""); // Clear the input
       notification.success({ message: 'Comment added successfully!' });
+      fetchPostAndComments();
     } catch (error) {
       console.error("Error adding comment:", error);
       notification.error({ message: 'Failed to add comment.' });
@@ -170,7 +171,7 @@ console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId)
             )}
           />
            <div style={{ marginTop: '16px' }}>
-            {localStorage.getItem('authToken') !== null && localStorage.getItem('role') === 'member' || localStorage.getItem('role') === 'shelter'? (
+            { localStorage.getItem('role') === 'member' || localStorage.getItem('role') === 'shelter'? (
               <>
                 <TextArea
                   rows={4}

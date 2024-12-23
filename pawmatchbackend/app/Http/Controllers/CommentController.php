@@ -10,15 +10,23 @@ class CommentController extends Controller
     public function store(Request $request)
 {
     $validated = $request->validate([
-        'post_id' => 'required|exists:forum_posts,post_id',
+        'post_id' => 'required|exists:forum_post,post_id',
         'comment' => 'required|string|max:500',
     ]);
+    if($request->input("role")== "member"){
+        $comment = Comment::create([
+            'post_id' => $validated['post_id'],
+            'member_id' => $request->input(key: "member_id"),
+            'comment' => $validated['comment'],
+        ]);
+    }else{
+        $comment = Comment::create([
+            'post_id' => $validated['post_id'],
+            'shelter_id' => $request->input(key: "shelter_id"),
+            'comment' => $validated['comment'],
+        ]);
+    }
 
-    $comment = Comment::create([
-        'post_id' => $validated['post_id'],
-       // 'user_id' => 1, // Temporarily set a user ID
-        'comment' => $validated['comment'],
-    ]);
     return response()->json($comment, 201);
 
     }

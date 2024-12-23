@@ -425,19 +425,29 @@ const Register = () => {
               <InputNumber min={0} style={{ width: "100%" }} />
             </Form.Item>
 
-            <Form.Item name="profile_picture" label="Profile Picture">
-              <Upload
-                name="profile_picture"
-                listType="picture"
-                fileList={fileList}
-                showUploadList={true}
-                maxCount={1}
-                onChange={handleChange}
-                beforeUpload={beforeUpload}
-              >
-                <Button icon={<UploadOutlined />}>Click to upload</Button>
-              </Upload>
-            </Form.Item>
+            <Form.Item
+            name="profile_picture"
+            label="Profile Picture"
+            rules={[
+              {
+                required: true,
+                message: 'Please upload a profile picture!',
+              },
+            ]}
+          >
+            <Upload
+              name="profile_picture"
+              listType="picture"
+              fileList={fileList}
+              showUploadList={true}
+              maxCount={1}
+              onChange={handleChange}
+              beforeUpload={beforeUpload}
+            >
+              <Button icon={<UploadOutlined />}>Click to upload</Button>
+            </Upload>
+          </Form.Item>
+
 
             {role === "Shelter" && (
               <>

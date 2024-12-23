@@ -54,8 +54,6 @@ class MemberProfileController extends Controller
         $validated = $request->validate([
             'name' => 'nullable|string|max:100',
             'username' => 'nullable|string|max:255',
-            'Age' => 'nullable|integer',
-            'bio' => 'nullable|string|max:255',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', 
             'state' => 'nullable|string|max:100',
             'district' => 'nullable|string|max:100',
@@ -88,8 +86,8 @@ class MemberProfileController extends Controller
                 'phone_number' => $member->phone_number,
                 'NoOfPets' => $member->NoOfPets,
                 'username' => $request->username,
-                // 'Age' => $request->Age,
-                // 'bio' => $request->bio,
+                'Age' => $request->Age,
+                'bio' => $request->bio,
             ]);
         } else {
             // Create new profile if it doesn't exist

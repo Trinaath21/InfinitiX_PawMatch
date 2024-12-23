@@ -1,0 +1,158 @@
+.edit-profile-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  .edit-profile-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #1a1a1a;
+    font-size: 28px;
+    font-weight: 600;
+  }
+  
+  .edit-profile-form .ant-form-item {
+    margin-bottom: 24px;
+  }
+  
+  .edit-profile-form .ant-input,
+  .edit-profile-form .ant-input-number,
+  .edit-profile-form .ant-select-selector,
+  .edit-profile-form .ant-cascader-picker {
+    height: 42px;
+    padding: 8px 11px;
+    border-radius: 6px;
+    border: 1px solid #d9d9d9;
+    transition: all 0.3s ease;
+  }
+  
+  .edit-profile-form .ant-input-number {
+    width: 100%;
+  }
+  
+  .edit-profile-form .ant-select-selection-item,
+  .edit-profile-form .ant-cascader-picker-label {
+    line-height: 24px;
+  }
+  
+  .edit-profile-form .ant-input:hover,
+  .edit-profile-form .ant-input-number:hover,
+  .edit-profile-form .ant-select-selector:hover,
+  .edit-profile-form .ant-cascader-picker:hover {
+    border-color: #40a9ff;
+  }
+  
+  .edit-profile-form .ant-input:focus,
+  .edit-profile-form .ant-input-number:focus,
+  .edit-profile-form .ant-select-selector:focus,
+  .edit-profile-form .ant-cascader-picker:focus {
+    border-color: #1890ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+  
+  .edit-profile-form .ant-form-item-label > label {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
+    margin-bottom: 24px;
+  }
+  
+  .button-group .ant-btn {
+    min-width: 120px;
+    height: 42px;
+    font-size: 16px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .button-group .ant-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .change-password-button {
+    text-align: center;
+    margin-top: 24px;
+  }
+  
+  .change-password-button .ant-btn {
+    min-width: 160px;
+    height: 42px;
+    font-size: 16px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* 修改密码模态框样式 */
+  .ant-modal-content {
+    border-radius: 12px;
+    padding: 24px;
+  }
+  
+  .ant-modal-header {
+    border-bottom: none;
+    padding: 0;
+    margin-bottom: 24px;
+  }
+  
+  .ant-modal-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+  
+  .ant-modal-body {
+    padding: 0;
+  }
+  
+  .ant-modal-footer {
+    border-top: none;
+    padding: 24px 0 0;
+  }
+  
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .edit-profile-container {
+      margin: 20px;
+      padding: 20px;
+    }
+  
+    .edit-profile-container h2 {
+      font-size: 24px;
+      margin-bottom: 24px;
+    }
+  
+    .button-group {
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .button-group .ant-btn {
+      width: 100%;
+    }
+  }
+  
+  /* 添加动画效果 */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  

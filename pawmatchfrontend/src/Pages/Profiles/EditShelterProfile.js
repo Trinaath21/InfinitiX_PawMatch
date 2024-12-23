@@ -9,9 +9,12 @@ import {
   Button,
   Spin,
   message,
-  Tag,
   Select,
+  Upload,
+  Modal,
 } from "antd";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+ import "./EditShelterProfile.css";
 
 const stateDistrictData = [
   {
@@ -186,14 +189,21 @@ const EditShelterProfile = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const prefixSelector = (
-    <Select defaultValue="06" style={{ width: 70 }}>
-      <Select.Option value="06">06</Select.Option>
+    <Select defaultValue="60" style={{ width: 70 }}>
+      <Select.Option value="60">60</Select.Option>
       <Select.Option value="86">86</Select.Option>
     </Select>
   );
 
   const authToken = localStorage.getItem("ShelterLoginToken");
   // Fetch shelter profile data
+  const [uploadLoading, setUploadLoading] = useState(false);
+
+  const [imageUrl, setImageUrl] = useState(profile?.profile_picture || null);
+
+  const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] =
+    useState(false);
+
   useEffect(() => {
     if (authToken) {
       axios
@@ -204,6 +214,11 @@ const EditShelterProfile = () => {
         })
         .then((response) => {
           setProfile(response.data.profile);
+          if (response.data.profile.profile_picture) {
+            setImageUrl(
+              `http://localhost:8000/storage/${response.data.profile.profile_picture}`
+            );
+          }
           setLoading(false);
         })
         .catch((err) => {
@@ -236,13 +251,32 @@ const EditShelterProfile = () => {
       })
       .then((response) => {
         message.success("Shelter profile updated successfully!");
-        navigate("/profiles/shelter");
+        navigate("/main/profiles/shelter");
       })
       .catch((err) => {
         message.error(
           err.response?.data?.message || "Failed to update shelter profile"
         );
         setLoading(false);
+      });
+  };
+
+  // add change password function
+  const handleChangePassword = (values) => {
+    axios
+      .post("http://localhost:8000/api/shelter/change-password", values, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      })
+      .then((response) => {
+        message.success("Password changed successfully");
+        setIsChangePasswordModalVisible(false);
+      })
+      .catch((error) => {
+        message.error(
+          error.response?.data?.message || "Password change failed"
+        );
       });
   };
 
@@ -268,8 +302,10 @@ const EditShelterProfile = () => {
   }
 
   return (
-    <div style={{ padding: "20px", maxWidth: 800, margin: "auto" }}>
+    <div className="edit-shelter-container">
+      <h2>Edit Shelter Profile</h2>
       <Form
+        className="edit-shelter-form"
         layout="vertical"
         initialValues={{
           shelter_name: profile.shelter_name,
@@ -285,22 +321,32 @@ const EditShelterProfile = () => {
         }}
         onFinish={handleSubmit}
       >
-        <Form.Item label="Shelter Name" name="shelter_name">
+        <Form.Item
+          rules={[{ required: true, message: "Please input shelter name!" }]}
+          label="Shelter Name"
+          name="shelter_name"
+        >
           <Input placeholder="Enter shelter name" />
         </Form.Item>
-        <Form.Item label="Representative Name" name="representative_name">
+        <Form.Item
+          rules={[
+            { required: true, message: "Please input representative name!" },
+          ]}
+          label="Representative Name"
+          name="representative_name"
+        >
           <Input placeholder="Enter representative name" />
         </Form.Item>
-
+        {/* 
         <Form.Item label="Username" name="username">
           <Input placeholder="Enter username" />
         </Form.Item>
-
+ */}
         <Form.Item
-          label="Phone Number"
+          label="Shelter Contact Number"
           name="phone_number"
           rules={[
-            { required: false, message: "Please input your phone number!" },
+            { required: true, message: "Please input your phone number!" },
             {
               pattern: /^\d{6,}$/,
               message: "Phone number must be at least 6 digits.",
@@ -310,11 +356,11 @@ const EditShelterProfile = () => {
           <Input addonBefore={prefixSelector} />
         </Form.Item>
         <Form.Item
-          label="Contact Number"
+          label="Representative Contact Number"
           name="contact_number"
           rules={[
             {
-              required: false,
+              required: true,
               message: "Please input your Representative contact number!",
             },
             {
@@ -331,7 +377,7 @@ const EditShelterProfile = () => {
           label="State and District"
           rules={[
             {
-              required: false,
+              required: true,
               message: "Please select the state and district!",
             },
           ]}
@@ -343,7 +389,7 @@ const EditShelterProfile = () => {
           name="detailed_address"
           label="Detailed Address"
           rules={[
-            { required: false, message: "Please input detailed address!" },
+            { required: true, message: "Please input detailed address!" },
           ]}
         >
           <Input />
@@ -352,7 +398,7 @@ const EditShelterProfile = () => {
         <Form.Item
           name="NoOfPets"
           label="Number of Pets"
-          rules={[{ required: false, message: "Please input number of pets!" }]}
+          rules={[{ required: true, message: "Please input number of pets!" }]}
         >
           <InputNumber min={0} style={{ width: "100%" }} />
         </Form.Item>
@@ -365,7 +411,7 @@ const EditShelterProfile = () => {
               message: "Please enter a valid URL (e.g., https://example.com).",
             },
             {
-              required: false,
+              required: true,
               message: "Website URL is required.",
             },
           ]}
@@ -377,21 +423,110 @@ const EditShelterProfile = () => {
           <Input.TextArea rows={4} />
         </Form.Item>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            gap: "10px",
-          }}
-        >
+        <div className="button-group">
           <Button type="primary" htmlType="submit">
-            Save Changes
+            Save Change
           </Button>
-          <Button onClick={() => navigate("/profiles/shelter")}>
+          <Button onClick={() => navigate("/main/profiles/shelter")}>
             Cancel
           </Button>
         </div>
       </Form>
+
+      <div className="change-password-button">
+        <Button
+          type="primary"
+          onClick={() => setIsChangePasswordModalVisible(true)}
+        >
+          Change Password
+        </Button>
+      </div>
+
+      <Modal
+        title="Change Password"
+        open={isChangePasswordModalVisible}
+        onCancel={() => setIsChangePasswordModalVisible(false)}
+        footer={null}
+      >
+        <Form layout="vertical" onFinish={handleChangePassword}>
+          <Form.Item
+            name="current_password"
+            label="Current Password"
+            rules={[
+              { required: true, message: "Please input current password" },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="new_password"
+            label="New Password"
+            rules={[
+              { required: true, message: "Please input new password" },
+              { min: 6, message: "Password must be at least 6 characters" },
+              {
+                pattern:
+                  /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*\d)[A-Za-z\d!@#$%^&*(),.?":{}|<>]{6,}$/,
+                message:
+                  "Password must contain at least one uppercase letter, one symbol, and one number.",
+              },
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item
+            name="confirm_password"
+            label="Confirm New Password"
+            dependencies={["new_password"]}
+            rules={[
+              { required: true, message: "Please confirm new password" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("new_password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error(
+                      "The two passwords that you entered do not match."
+                    )
+                  );
+                },
+              }),
+            ]}
+          >
+            <Input.Password />
+          </Form.Item>
+
+          <Form.Item style={{ textAlign: "right", marginBottom: 0 }}>
+            <Button
+              type="default"
+              style={{ marginRight: 8 }}
+              onClick={() => setIsChangePasswordModalVisible(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Confirm
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+      <style jsx>{`
+        .avatar-uploader > .ant-upload {
+          width: 128px;
+          height: 128px;
+        }
+        .ant-upload-select-picture-card i {
+          font-size: 32px;
+          color: #999;
+        }
+        .ant-upload-select-picture-card .ant-upload-text {
+          margin-top: 8px;
+          color: #666;
+        }
+      `}</style>
     </div>
   );
 };

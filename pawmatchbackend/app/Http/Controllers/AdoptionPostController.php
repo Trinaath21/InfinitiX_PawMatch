@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\PetAdoptionPost;
 use App\Models\AdoptionApplication;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class AdoptionPostController extends Controller
 {
@@ -55,11 +56,11 @@ class AdoptionPostController extends Controller
         $post->isFromShelter = 0;
 
         if ($request->hasFile('petImage')) {
-            \Log::info("Image file exists.");
+            Log::info("Image file exists.");
             $file = $request->file('petImage');
             $post->petImage = file_get_contents($file->getPathname());
         } else {
-            \Log::warning("No image file found in the request.");
+            Log::warning("No image file found in the request.");
         }
 
         $post->save();
@@ -92,7 +93,7 @@ class AdoptionPostController extends Controller
     public function update(Request $request, $id)
     {
 
-        \Log::info('Request Data:', $request->all());
+        Log::info('Request Data:', $request->all());
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -249,7 +250,7 @@ class AdoptionPostController extends Controller
 
         // Use the Eloquent model to delete the record
         $deleted = PetAdoptionPost::where('adoption_post_id', $adoption_post_id)->delete();
-        \Log::info($adoption_post_id);
+        Log::info($adoption_post_id);
 
 
         if ($deleted) {

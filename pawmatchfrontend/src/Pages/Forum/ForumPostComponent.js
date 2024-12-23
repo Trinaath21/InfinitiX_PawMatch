@@ -450,7 +450,7 @@ const handleSubmit = async () => {
 />
 
       {/* Category Buttons */}
-      <div style={{ marginBottom: 16, textAlign: 'center' }}>
+     {/*<div style={{ marginBottom: 16, textAlign: 'center' }}>
         <Button
           type={currentCategory === 'general' ? 'primary' : 'default'}
           
@@ -476,7 +476,7 @@ const handleSubmit = async () => {
         >
           My Posts
         </Button>
-      </div>
+      </div>*/}
 
       {/* Post List */}
       <div style={{ padding: 24, minHeight: 360, background: colorBgContainer, borderRadius: borderRadiusLG }}>

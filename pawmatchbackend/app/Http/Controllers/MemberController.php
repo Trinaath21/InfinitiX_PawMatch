@@ -145,13 +145,13 @@ class MemberController extends Controller
 
         $member = Member::find(auth('sanctum')->user()->user_id);
 
-        if (!Hash::check($request->current_password, $member->password)) {
+        if ($request->current_password !== $member->password) {
             return response()->json([
                 'message' => 'Current password is incorrect'
             ], 401);
         }
 
-        $member->password = Hash::make($request->new_password);
+        $member->password = $request->new_password;
         $member->save();
 
         return response()->json([

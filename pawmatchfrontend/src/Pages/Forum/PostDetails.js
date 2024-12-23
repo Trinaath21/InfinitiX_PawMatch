@@ -31,10 +31,10 @@ const PostDetails = () => {
   const fetchPostAndComments = async () => {
     setLoading(true);
     try {
-      const postResponse = await axios.get(`http://localhost:8000/posts/${post_id}`);
+      const postResponse = await axios.get(`http://localhost:8000/api/posts/${post_id}`);
       setPost(postResponse.data);
 
-      const commentsResponse = await axios.get(`http://localhost:8000/posts/${post_id}/comments`);
+      const commentsResponse = await axios.get(`http://localhost:8000/api/posts/${post_id}/comments`);
       setComments(commentsResponse.data);
     } catch (error) {
       console.error("Error fetching post or comments:", error);
@@ -64,7 +64,7 @@ const PostDetails = () => {
     try {
       const token = localStorage.getItem('authToken'); // Get the auth token
       const userRole = localStorage.getItem('role'); // Get the user role from local storage
-      const memberId = localStorage.getItem('member_id');
+      const memberId = localStorage.getItem('user_id');
       const shelterId = localStorage.getItem('shelter_id');
 console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId);
      /* const response = await axios.post(
@@ -83,7 +83,7 @@ console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId)
       };
   
       if (userRole === "member") {
-        payload.member_id = memberId || null;
+        payload.user_id = memberId || null;
       } else if (userRole === "shelter") {
         payload.shelter_id = shelterId || null;
       }
@@ -99,6 +99,7 @@ console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId)
       setComments((prevComments) => [...prevComments, response.data]);
       setNewComment(""); // Clear the input
       notification.success({ message: 'Comment added successfully!' });
+      fetchPostAndComments();
     } catch (error) {
       console.error("Error adding comment:", error);
       notification.error({ message: 'Failed to add comment.' });
@@ -163,14 +164,14 @@ console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId)
               <List.Item key={comment.comment_id}>
                 <List.Item.Meta
                  avatar={<Avatar src={comment?.shelter?.profile_picture || comment?.member?.profile_picture || "https://via.placeholder.com/150"} />}
-                 title={comment?.member?.name ||comment?.shelter?.shelter_name||'Anonymous' }
+                 title={comment?.member?.name ||comment?.shelter?.shelter_name}
                  description={comment?.comment || 'No comment available'}
                 />
               </List.Item>
             )}
           />
            <div style={{ marginTop: '16px' }}>
-            {localStorage.getItem('authToken') !== null && localStorage.getItem('role') === 'member' || localStorage.getItem('role') === 'shelter'? (
+            { localStorage.getItem('role') === 'member' || localStorage.getItem('role') === 'shelter'? (
               <>
                 <TextArea
                   rows={4}
