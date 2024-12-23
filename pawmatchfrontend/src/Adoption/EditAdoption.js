@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Layout, Button, Form, Input, InputNumber, Select, Radio, Upload, message, Typography, Row, Col, Modal, Cascader } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import FooterBar from '../General Components/FooterBar.js';
+import Sidebar from '../General Components/SideBar.js';
 import { useLocation } from 'react-router-dom'; // Import useLocation
 import { useNavigate, useParams } from "react-router-dom";
 

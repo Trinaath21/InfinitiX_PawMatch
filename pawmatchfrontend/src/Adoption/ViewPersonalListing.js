@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 //import Button from '@mui/material/Button';
 import { CardMedia } from "@mui/material";
 import { styled } from '@mui/material/styles';
+import FooterBar from '../General Components/FooterBar.js';
+import Sidebar from '../General Components/SideBar.js';
 import { useNavigate, useParams } from "react-router-dom";
 
 
@@ -112,6 +114,11 @@ function ViewPersonalListing() {
     }
   };
 
+  const handleViewApplications = (adoption_post_id) => {
+    console.log("Viewing details for post id:", adoption_post_id);
+    navigate('/ViewApplications', { state: { adoption_post_id: adoption_post_id, page:"/viewPersonalListing" } });
+  };
+
   const handleViewMore = (adoption_post_id) => {
     console.log("Viewing details for post id:", adoption_post_id);
     navigate('/ViewMoreAdoption', { state: { adoption_post_id: adoption_post_id, page:"/viewPersonalListing" } });
@@ -209,6 +216,7 @@ function ViewPersonalListing() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {/* View Applications Button */}
                 <Button
+                  onClick={() => handleViewApplications(tableMeta.rowData[0])}
                   type="primary"
                   icon={<EyeOutlined />}
                   style={{ backgroundColor: '#f6ffed', color: '#52c41a', borderColor: '#b7eb8f' }}

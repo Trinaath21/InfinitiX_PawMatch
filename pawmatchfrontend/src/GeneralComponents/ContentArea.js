@@ -3,7 +3,7 @@ import { Layout, theme } from 'antd';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 // LostFound
 import PersonalListing from '../LostFoundReport/PersonalListing';
-import ViewMoreDetails from '../LostFoundReport/ViewMoreDetails'; 
+import ViewMoreDetails from '../LostFoundReport/ViewMoreDetails';
 import PublicLostPetListings from '../LostFoundReport/PublicLostPetListings';
 import ViewReplyReport from '../LostFoundReport/ViewReplyReport';
 // Adoption
@@ -13,6 +13,8 @@ import ViewPersonalListing from "../Adoption/ViewPersonalListing.js";
 import ApplyAdoption from "../Adoption/ApplyAdoption.js";
 import ViewMoreAdoption from "../Adoption/ViewMoreAdoption.js";
 import ViewPublicListing from "../Adoption/ViewPublicListing.js";
+import ViewApplications from '../Adoption/ViewApplications.js';
+import ViewMoreApplication from '../Adoption/ViewMoreApplication.js';
 // Donation
 import EditDonation from '../Donation/EditDonation';
 import AddDonation from '../Donation/AddDonation';
@@ -49,7 +51,7 @@ const ContentArea = () => {
   const [collapsed, setCollapsed] = React.useState(false);
 
   const toggleCollapse = () => setCollapsed(!collapsed);
-  
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
@@ -58,7 +60,7 @@ const ContentArea = () => {
   const location = useLocation();
 
   // Define the routes where Sidebar and FooterBar should NOT be shown
-  const noSidebarFooterRoutes = ['/login', '/register', '/forget-password', '/reset-password','/landing'];
+  const noSidebarFooterRoutes = ['/login', '/register', '/forget-password', '/reset-password', '/landing'];
 
   // Check if the current route is in the noSidebarFooterRoutes array
   const showSidebarAndFooter = !noSidebarFooterRoutes.includes(location.pathname);
@@ -71,17 +73,17 @@ const ContentArea = () => {
 
       <Layout>
         <Content
-          // style={{
-          //   margin: '24px 16px',
-          //   padding: 24,
-          //   minHeight: 280,
-          //   background: colorBgContainer,
-          //   borderRadius: borderRadiusLG,
-          // }}
+        // style={{
+        //   margin: '24px 16px',
+        //   padding: 24,
+        //   minHeight: 280,
+        //   background: colorBgContainer,
+        //   borderRadius: borderRadiusLG,
+        // }}
         >
           <Routes>
             <Route path="/" element={<Navigate to="/landing" replace />} />
-            <Route path="/landing" element={<LandingPage/>} />
+            <Route path="/landing" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forget-password" element={<ForgotPassword />} />
@@ -110,6 +112,8 @@ const ContentArea = () => {
             <Route path="/applyAdoption" element={<ApplyAdoption />} />
             <Route path="/ViewMoreAdoption" element={<ViewMoreAdoption />} />
             <Route path="/ViewPublicListing" element={<ViewPublicListing />} />
+            <Route path="/ViewApplications" element={<ViewApplications />} />
+            <Route path="/ViewMoreApplication" element={<ViewMoreApplication />} />
 
             {/* Donation Routes */}
             <Route path="/ViewMyDonation" element={<ViewMyDonation />} />

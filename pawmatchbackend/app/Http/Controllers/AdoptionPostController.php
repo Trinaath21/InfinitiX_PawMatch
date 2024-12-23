@@ -12,7 +12,7 @@ class AdoptionPostController extends Controller
     public function store(Request $request)
     {
         $id = $request->input("id");
-        
+
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'species' => 'required|string|max:50',
@@ -211,36 +211,36 @@ class AdoptionPostController extends Controller
     }
 
     public function getPostsAndApplications(Request $request)
-{
-    $id = $request->query('id');
+    {
+        $id = $request->query('id');
 
-    if (!$id) {
-        return response()->json([
-            'error' => 'id query parameter is required.'
-        ], 400);
-    }
-
-    // Fetch posts based on user ID
-    $posts = PetAdoptionPost::where('id', $id)->get();
-
-    // Process each post to handle the pet image
-    $posts = $posts->map(function ($post) {
-        if ($post->petImage) {
-            $mimeType = finfo_buffer(finfo_open(), $post->petImage, FILEINFO_MIME_TYPE);
-            $post->petImage = 'data:' . $mimeType . ';base64,' . base64_encode($post->petImage);
+        if (!$id) {
+            return response()->json([
+                'error' => 'id query parameter is required.'
+            ], 400);
         }
-        return $post;
-    });
 
-    // Fetch adoption applications based on user ID
-    $applications = AdoptionApplication::where('user_id', $id)->get();
+        // Fetch posts based on user ID
+        $posts = PetAdoptionPost::where('id', $id)->get();
 
-    // Combine both datasets and send as a single response
-    return response()->json([
-        'posts' => $posts,
-        'applications' => $applications,
-    ], 200);
-}
+        // Process each post to handle the pet image
+        $posts = $posts->map(function ($post) {
+            if ($post->petImage) {
+                $mimeType = finfo_buffer(finfo_open(), $post->petImage, FILEINFO_MIME_TYPE);
+                $post->petImage = 'data:' . $mimeType . ';base64,' . base64_encode($post->petImage);
+            }
+            return $post;
+        });
+
+        // Fetch adoption applications based on user ID
+        $applications = AdoptionApplication::where('user_id', $id)->get();
+
+        // Combine both datasets and send as a single response
+        return response()->json([
+            'posts' => $posts,
+            'applications' => $applications,
+        ], 200);
+    }
 
 
     public function deleteAdoptionPost(Request $request)

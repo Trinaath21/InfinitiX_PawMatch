@@ -74,6 +74,8 @@ Route::post('/getSpecificPost', [AdoptionPostController::class, 'viewMore']);
 Route::post('/deleteAdoptionPost', [AdoptionPostController::class, 'deleteAdoptionPost']);
 Route::get('/member-address', [AdoptionApplicationController::class, 'getAddressByUserId']);
 Route::post('/apply-adoption', [AdoptionApplicationController::class, 'store']);
+Route::get('/get-applications', [AdoptionApplicationController::class, 'getApplicationsByPostID']);
+Route::get('/get-application-by-applicant', [AdoptionApplicationController::class, 'getApplicationByApplicationID']);
 
 //login register module
 Route::post('/member/register', [MemberController::class, 'register']);

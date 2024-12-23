@@ -32,6 +32,70 @@ class AdoptionApplicationController extends Controller
         return response()->json($member, 200);
     }
 
+    public function getApplicationsByPostID(Request $request)
+    {
+        $adoption_post_id = $request->query('adoption_post_id');
+
+        if (!$adoption_post_id) {
+            return response()->json([
+                'error' => 'adoption_post_id query parameter is required.'
+            ], 400);
+        }
+
+        // Fetch posts based on the provided user ID
+        $applications = AdoptionApplication::where('adoption_post_id', $adoption_post_id)->get();
+
+        if ($applications->isEmpty()) {
+            return response()->json(['error' => 'No posts found for this user'], 404);
+        }
+
+        // Process each post to handle the pet image
+        // $applications = $applications->map(function ($post) {
+        //     if ($post->petImage) {
+        //         // Determine MIME type for the image data
+        //         $mimeType = finfo_buffer(finfo_open(), $post->petImage, FILEINFO_MIME_TYPE);
+
+        //         // Encode the image as Base64 and attach it with the MIME type
+        //         $post->petImage = 'data:' . $mimeType . ';base64,' . base64_encode($post->petImage);
+        //     }
+        //     return $post;
+        // });
+
+        return response()->json($applications, 200);
+    }
+
+    public function getApplicationByApplicationID(Request $request)
+    {
+        $application_id = $request->query('application_id');
+
+        if (!$application_id) {
+            return response()->json([
+                'error' => 'application_id query parameter is required.'
+            ], 400);
+        }
+
+        // Fetch posts based on the provided user ID
+        $application = AdoptionApplication::where('application_id', $application_id)->get();
+
+        if ($application->isEmpty()) {
+            return response()->json(['error' => 'No application found for this application id'], 404);
+        }
+
+        // Process each post to handle the pet image
+        // $applications = $applications->map(function ($post) {
+        //     if ($post->petImage) {
+        //         // Determine MIME type for the image data
+        //         $mimeType = finfo_buffer(finfo_open(), $post->petImage, FILEINFO_MIME_TYPE);
+
+        //         // Encode the image as Base64 and attach it with the MIME type
+        //         $post->petImage = 'data:' . $mimeType . ';base64,' . base64_encode($post->petImage);
+        //     }
+        //     return $post;
+        // });
+
+        return response()->json($application, 200);
+    }
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
