@@ -11,8 +11,6 @@ import Typography from '@mui/material/Typography';
 //import Button from '@mui/material/Button';
 import { CardMedia } from "@mui/material";
 import { styled } from '@mui/material/styles';
-import FooterBar from '../General Components/FooterBar.js';
-import Sidebar from '../General Components/SideBar.js';
 import { useNavigate, useParams } from "react-router-dom";
 
 

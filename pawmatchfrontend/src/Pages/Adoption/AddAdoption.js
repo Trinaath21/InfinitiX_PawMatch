@@ -3,8 +3,7 @@ import { Layout, Button, Form, Input, InputNumber, Select, Radio, Upload, Typogr
 import { PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate, useParams } from "react-router-dom";
-import FooterBar from '../General Components/FooterBar.js';
-import Sidebar from '../General Components/SideBar.js';
+
 
 function AddAdoption() {
     const { TextArea } = Input;

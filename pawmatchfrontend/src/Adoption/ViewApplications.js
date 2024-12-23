@@ -7,8 +7,6 @@ import axios from "axios";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import Typography from '@mui/material/Typography';
-import FooterBar from '../General Components/FooterBar.js';
-import Sidebar from '../General Components/SideBar.js';
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 const muiCache = createCache({
