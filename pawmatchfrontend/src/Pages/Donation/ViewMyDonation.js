@@ -20,14 +20,16 @@ function ViewMyDonation() {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [donationDetailsExist, setDonationDetailsExist] = useState(false);
-  const { shelterId } = useParams();
+  //const { shelterId } = useParams();
   const navigate = useNavigate();
 
-  const defaultShelterId = shelterId || 7; // Use shelterId from URL or default to 7
+  // Retrieve shelter_id from local storage
+  const shelterId = parseInt(localStorage.getItem("shelter_id"), 10);
 
   useEffect(() => {
-    fetchDonationDetails(defaultShelterId);
-  }, [defaultShelterId]);
+    console.log("useEffect triggered with shelterId:", shelterId);
+    fetchDonationDetails(shelterId);
+  }, [shelterId]);
 
   const fetchDonationDetails = async (id) => {
     setLoading(true);
@@ -35,33 +37,38 @@ function ViewMyDonation() {
       const response = await axios.get(
         `http://localhost:8000/api/donations/${id}`
       );
-      const { account_owner_name, account_number, qr_code } = response.data;
+      const { account_owner_name, account_number, qr_code, bank } = response.data;
 
-      if (account_owner_name || account_number || qr_code) {
+      if (account_owner_name || account_number || qr_code || bank) {
         setDonationDetailsExist(true);
         form.setFieldsValue({
           accountOwnerName: account_owner_name,
           accountNumber: account_number,
           qr_code: qr_code,
+          bank: bank,
         });
       } else {
         setDonationDetailsExist(false);
       }
     } catch (error) {
-      console.error("Fetch error:", error);
-      message.error("Failed to fetch donation details");
-      setDonationDetailsExist(false);
+      if (error.response && error.response.status === 404) {
+        setDonationDetailsExist(false); // Donation not found
+      } else {
+        console.error("Fetch error:", error);
+        message.error("Failed to fetch donation details");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleEditClick = () => {
-    navigate(`/edit-donation/${defaultShelterId}`); // Navigate to EditDonation.js with shelterId
+    navigate(`/edit-donation/${shelterId}`); // Navigate to EditDonation.js with shelterId
   };
 
   const handleAddDonationClick = () => {
-    navigate("../donation/add"); // Navigate to AddDonation.js
+    navigate("/AddDonation", { state: { shelterId } });
+ // Navigate to AddDonation.js
   };
 
   return (
@@ -105,10 +112,16 @@ function ViewMyDonation() {
                 </Form.Item>
               </Col>
             </Row>
-            <Row justify="center" style={{ marginTop: "20px" }}>
-              <Col>
+            <Row>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Bank" name="bank">
+                  <Input placeholder="Bank" disabled />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={12} style={{ paddingLeft: "10px" }}>
                 <Form.Item label="QR Code">
-                  <div style={{ textAlign: "center" }}>
+                  <div >
                     <img
                       src={form.getFieldValue("qr_code")}
                       alt="QR Code"

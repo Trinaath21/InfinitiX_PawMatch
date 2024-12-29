@@ -174,7 +174,8 @@ const EditStrayReport = ({ visible, onClose, reportData, refreshTableData }) => 
                 formData.append('colour', values.colour);
                // formData.append('status', values.status);
                 formData.append('dateSighting', values.dateSighting.format('YYYY-MM-DD')); // Ensure the date is properly formatted
-                formData.append('location', values.location);
+                //formData.append('location', values.location);
+                formData.append('location', values.location || reportData.location);
                 formData.append('description', values.description);
                 formData.append('contactPhone', values.contactPhone);
                 formData.append('lat', values.lat);

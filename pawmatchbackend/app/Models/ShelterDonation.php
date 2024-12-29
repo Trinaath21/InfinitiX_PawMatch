@@ -17,6 +17,7 @@ class ShelterDonation extends Model
         'qr_code',
         'account_owner_name',
         'account_number',
+        'bank',
     ];
 
     public function shelter()

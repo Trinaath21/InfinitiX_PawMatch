@@ -31,6 +31,7 @@ Route::post('/notify-users', [LostFoundController::class, 'notifyUsers']);
 Route::post('/notify-reportOwner', [LostFoundController::class, 'notifyReportOwner']);
 Route::post('/getSpecificUser', [LostFoundController::class, 'getSpecificUser']);
 Route::post('/addReplyReport', [LostFoundController::class, 'addReplyReport']);
+Route::post('/addReplyReportGuest', [LostFoundController::class, 'addReplyReportGuest']);
 Route::post('/getReplyReportsByReportID', [LostFoundController::class, 'getReplyReportsByReportID']);
 Route::post('/approveReplyReport', [LostFoundController::class, 'approveReplyReport']);
 Route::post('/rejectReplyReport', [LostFoundController::class, 'rejectReplyReport']);
@@ -76,6 +77,9 @@ Route::get('/member-address', [AdoptionApplicationController::class, 'getAddress
 Route::post('/apply-adoption', [AdoptionApplicationController::class, 'store']);
 Route::get('/get-applications', [AdoptionApplicationController::class, 'getApplicationsByPostID']);
 Route::get('/get-application-by-applicant', [AdoptionApplicationController::class, 'getApplicationByApplicationID']);
+Route::post('/accept-application', [AdoptionApplicationController::class, 'acceptApplication']);
+Route::post('/reject-application', [AdoptionApplicationController::class, 'rejectApplication']);
+
 
 //login register module
 Route::post('/member/register', [MemberController::class, 'register']);
@@ -95,3 +99,7 @@ Route::middleware('auth:sanctum')->group(function () {
 //Change password 
 Route::middleware('auth:sanctum')->post('/shelter/change-password', [ShelterController::class, 'changePassword']);
 Route::middleware('auth:sanctum')->post('/member/change-password', [MemberController::class, 'changeMemberPassword']);
+
+//member and shelter reset password module
+Route::post('/member/reset-password', [MemberController::class, 'resetPassword']);
+Route::post('/shelter/reset-password', [ShelterController::class, 'resetPassword']);

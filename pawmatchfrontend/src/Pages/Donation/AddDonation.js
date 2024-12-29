@@ -12,8 +12,9 @@ import {
   Modal,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Select } from "antd";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 const { Content } = Layout;
 const { Title } = Typography;
 
@@ -24,20 +25,40 @@ function AddDonation() {
   const [fileList, setFileList] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
   const [loading, setLoading] = useState(false); // Loading state
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate(); // Initialize useNavigate 
+  const location = useLocation();
 
   const toggleCollapse = () => {
     setCollapsed(!collapsed);
   };
+
+  const [shelterId, setShelterId] = useState(null);
+
+  useEffect(() => {
+    // Retrieve shelterId from local storage
+    const passedShelterId = location.state?.shelterId;
+    if (passedShelterId) {
+      setShelterId(passedShelterId);
+    } else {
+      const storedShelterId = localStorage.getItem("shelterId");
+      if (storedShelterId) {
+        setShelterId(storedShelterId);
+      } else {
+        message.error("Shelter ID not found! Please try again.");
+        navigate("/"); // Redirect to home or login page if no ID
+      }
+    }
+  }, [location.state, navigate]);
 
   const normFile = (e) => (Array.isArray(e) ? e : e?.fileList);
 
   const onFinish = async (values) => {
     setLoading(true); // Start loading
     const formData = new FormData();
-    //formData.append('shelterId', values.shelterId);
+    formData.append("shelterId", shelterId);// Use shelterId from localStorage
     formData.append("accountOwnerName", values.accountOwnerName);
     formData.append("accountNumber", values.accountNumber);
+    formData.append("bank", values.bank);
     if (fileList[0]) {
       formData.append("qrImage", fileList[0].originFileObj);
     }
@@ -53,7 +74,7 @@ function AddDonation() {
         }
       );
       message.success("Donation details submitted successfully");
-      navigate("/main/donation/view-my");
+      navigate("/ViewMyDonation");
     } catch (error) {
       console.error("Submission error:", error);
       message.error("Failed to submit donation details");
@@ -154,10 +175,36 @@ function AddDonation() {
               </Col>
 
               <Row justify="center" style={{ width: "100%" }}>
+
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label="Select Bank"
+                    name="bank"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select a bank",
+                      },
+                    ]}
+                  >
+                    <Select placeholder="Select a bank">
+                      <Select.Option value="Maybank">Maybank</Select.Option>
+                      <Select.Option value="CIMB Bank">CIMB Bank</Select.Option>
+                      <Select.Option value="Public Bank">Public Bank</Select.Option>
+                      <Select.Option value="RHB Bank">RHB Bank</Select.Option>
+                      <Select.Option value="Hong Leong Bank">Hong Leong Bank</Select.Option>
+                      <Select.Option value="Ambank">Ambank</Select.Option>
+                      <Select.Option value="Bank Islam">Bank Islam</Select.Option>
+                      <Select.Option value="Bank Rakyat">Bank Rakyat</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+
                 <Col
                   xs={24}
                   sm={12}
-                  style={{ display: "flex", justifyContent: "center" }}
+                  style={{ paddingLeft: "20px" }}
+                  //style={{ display: "flex", justifyContent: "center" }}
                 >
                   <Form.Item
                     label="Upload QR Code"
@@ -205,7 +252,7 @@ function AddDonation() {
               </Button>
               <Button
                 type="default"
-                onClick={() => navigate("../donation/view-my")}
+                onClick={() => navigate("/ViewMyDonation")}
               >
                 Back
               </Button>

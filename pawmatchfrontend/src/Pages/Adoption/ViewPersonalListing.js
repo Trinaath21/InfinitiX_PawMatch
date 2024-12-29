@@ -70,17 +70,24 @@ function ViewPersonalListing() {
   };
 
   // const id = localStorage.getItem('id') || 21; // Uncomment this later for real usage
-  const id = 21; // Hardcoded for now
+  const role = localStorage.getItem('role');
+  const id = role === 'member' ? parseInt(localStorage.getItem('user_id'), 10) : parseInt(localStorage.getItem('shelter_id'), 10);
+  //const id = parseInt(localStorage.getItem('user_id'), 10); // Hardcoded for now
 
 
   const refreshTableData = async () => {
-    if (!id) {
-      console.error("ID is undefined. Cannot fetch data.");
+    if (!id || !role) {
+      console.error("ID or role is undefined. Cannot fetch data.");
       return;
     }
     setLoading(true); // Show loading indicator
     try {
-      const response = await axios.get(`http://localhost:8000/api/adoption-posts?id=${id}`);
+      const response = await axios.get(`http://localhost:8000/api/adoption-posts`, {
+        params: {
+          id: id,
+          role: role,
+        },
+      });
       console.log("Fetched data:", response.data);
       const adoptionData = response.data.map(post => ({
         name: post.name,
@@ -114,12 +121,12 @@ function ViewPersonalListing() {
 
   const handleViewApplications = (adoption_post_id) => {
     console.log("Viewing details for post id:", adoption_post_id);
-    navigate('/ViewApplications', { state: { adoption_post_id: adoption_post_id, page:"/viewPersonalListing" } });
+    navigate('/ViewApplications', { state: { adoption_post_id: adoption_post_id, page: "/viewPersonalListing" } });
   };
 
   const handleViewMore = (adoption_post_id) => {
     console.log("Viewing details for post id:", adoption_post_id);
-    navigate('/ViewMoreAdoption', { state: { adoption_post_id: adoption_post_id, page:"/viewPersonalListing" } });
+    navigate('/ViewMoreAdoption', { state: { adoption_post_id: adoption_post_id, page: "/viewPersonalListing" } });
   };
 
   const handleEdit = (adoption_post_id) => {
@@ -206,7 +213,7 @@ function ViewPersonalListing() {
         sort: false,
         customBodyRender: (value, tableMeta) => {
           const isAvailable = tableMeta.rowData[7] === "available"; // Adjust index 3 to your status column position
-          const adoption_post_id = tableMeta.rowData[0]; 
+          const adoption_post_id = tableMeta.rowData[0];
 
           return (
             <Space style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
@@ -321,15 +328,15 @@ function ViewPersonalListing() {
     <div>
       <Content style={{ margin: '24px 16px 0' }}>
         <div>
-        <Col span={24}>
-          <Button
-            type="primary"
-            onClick={handleAddAdoptionPost}
-            style={{ marginBottom: '20px' }}
-          >
-            Add Adoption Post
-          </Button>
-        </Col>
+          <Col span={24}>
+            <Button
+              type="primary"
+              onClick={handleAddAdoptionPost}
+              style={{ marginBottom: '20px' }}
+            >
+              Add Adoption Post
+            </Button>
+          </Col>
         </div>
         <div style={{ width: '100%', maxWidth: '1200px', padding: '0px', background: '#fff', borderRadius: '8px', margin: 'auto' }}>
 

@@ -62,7 +62,7 @@ function ViewAllDonation() {
       .then((response) => {
         const updatedShelters = response.data.map((shelter) => ({
           ...shelter,
-          location: `${shelter.address}, ${shelter.district}, ${shelter.state}`,
+          location: `${shelter.detailed_address}, ${shelter.district}, ${shelter.state}`,
         }));
         setShelter(updatedShelters);
 
@@ -264,6 +264,7 @@ function ViewAllDonation() {
                   {donationDetails.account_owner_name || "N/A"}
                 </p>
                 <p>Account Number: {donationDetails.account_number || "N/A"}</p>
+                <p>Bank: {donationDetails.bank || "N/A"}</p>
                 {donationDetails.qr_code ? (
                   <CardMedia
                     component="img"

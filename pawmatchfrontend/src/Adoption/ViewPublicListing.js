@@ -19,8 +19,12 @@ const ViewPublicListing = () => {
     const [districtOptions, setDistrictOptions] = useState([]);
     const [speciesOptions, setSpeciesOptions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const id = 21; // Replace with the actual user_id
+    //const id = 21; // Replace with the actual user_id
+    //const role = localStorage.getItem('role');
+    const id = parseInt(localStorage.getItem('user_id'), 10);
     const itemsPerPage = 6;
+
+    const userRole = localStorage.getItem('role') || 'guest'; // Default to "guest" if no role found
 
     useEffect(() => {
         // Fetch combined data (posts and applications)
@@ -114,7 +118,7 @@ const ViewPublicListing = () => {
                         placeholder="Select Species"
                         style={{ width: '100%' }}
                         value={species}
-                        onChange={(value) => setDistrict(value)}
+                        onChange={(value) => setSpecies(value)}
                     >
                         <Option value="">All Species</Option>
                         {speciesOptions.map((species, index) => (
@@ -208,28 +212,29 @@ const ViewPublicListing = () => {
                                                             Status: {post.status}
                                                         </Typography.Text>
                                                     </div>
-                                                    <div style={{
-                                                        display: 'flex',
-                                                        justifyContent: 'center',
-                                                        marginTop: '16px',  // Optional: Adjust spacing from other elements
-                                                    }}>
-                                                        <Button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation(); // Prevent the click event from propagating to the card
-                                                                handleApply(post.adoption_post_id);
-                                                            }}
-                                                            //navigate('/ViewMoreAdoption', { state: { adoption_post_id: adoption_post_id } });
-                                                            type="default"
-                                                            style={{
-                                                                backgroundColor: post.status === 'available' ? '#ecffe3' : '',
-                                                                color: post.status === 'available' ? '#52c41a' : '#d9d9d9',
-                                                                borderColor: post.status === 'available' ? '#b7eb8f' : '#d9d9d9',
-                                                            }}
-                                                            disabled={!(post.status === 'available')}
-                                                        >
-                                                            Apply to Adopt
-                                                        </Button>
-                                                    </div>
+                                                    {userRole !== 'guest' && (
+                                                        <div style={{
+                                                            display: 'flex',
+                                                            justifyContent: 'center',
+                                                            marginTop: '16px',
+                                                        }}>
+                                                            <Button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleApply(post.adoption_post_id);
+                                                                }}
+                                                                type="default"
+                                                                style={{
+                                                                    backgroundColor: post.status === 'available' ? '#ecffe3' : '',
+                                                                    color: post.status === 'available' ? '#52c41a' : '#d9d9d9',
+                                                                    borderColor: post.status === 'available' ? '#b7eb8f' : '#d9d9d9',
+                                                                }}
+                                                                disabled={!(post.status === 'available')}
+                                                            >
+                                                                Apply to Adopt
+                                                            </Button>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             }
                                         />

@@ -9,14 +9,15 @@ function ApplyAdoption() {
     const { Content } = Layout;
     const location = useLocation();
     const navigate = useNavigate();
-    const userID = 21; // Replace with actual user ID logic
+    const userID = parseInt(localStorage.getItem('user_id'), 10);
+    //const userID = 21; // Replace with actual user ID logic
     const postID = location.state?.adoption_post_id;
 
     const [formData, setFormData] = useState({
-        applicant_name: '',
-        applicant_age: 0,
+        name: '',
+        age: 0,
         phone_number: '',
-        current_pets_count: 0,
+        NoOfPets: 0,
         previous_pet_experience: 'None',
         detailed_address: '',
         district: '',
@@ -33,9 +34,12 @@ function ApplyAdoption() {
         const fetchUserAddress = async () => {
             try {
                 const response = await axios.get(`http://127.0.0.1:8000/api/member-address?id=${userID}`);
-                const { detailed_address, district, state } = response.data;
+                const { name, phone_number, NoOfPets, detailed_address, district, state } = response.data;
                 setFormData((prevData) => ({
                     ...prevData,
+                    name, 
+                    phone_number, 
+                    NoOfPets,
                     detailed_address,
                     district,
                     state,
@@ -89,26 +93,36 @@ function ApplyAdoption() {
                     >
                         <Row gutter={16}>
                             <Col span={12}>
-                                <Form.Item label="Applicant Name" name="applicant_name" rules={[{ required: true, message: 'Please input your name!' }]}>
-                                    <Input name="applicant_name" value={formData.applicant_name} onChange={handleChange} placeholder="Enter your full name" />
+                                {/* <Form.Item label="Applicant Name" name="applicant_name" rules={[{ required: true, message: 'Please input your name!' }]}>
+                                    <Input name="applicant_name" value={formData.name} onChange={handleChange} placeholder="Enter your full name" />
+                                    <Input value={formData.name} readOnly />
+                                </Form.Item> */}
+                                <Form.Item label="Applicant Name">
+                                    <Input value={formData.name} readOnly />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
                                 <Form.Item label="Applicant Age" name="applicant_age" rules={[{ required: true, message: 'Please input your age!' }]}>
-                                    <InputNumber name="applicant_age" value={formData.applicant_age} min={1} onChange={(value) => handleSelectChange(value, 'applicant_age')} placeholder="Enter your age" style={{ width: '100%' }} />
+                                    <InputNumber name="applicant_age" value={formData.age} min={1} onChange={(value) => handleSelectChange(value, 'age')} placeholder="Enter your age" style={{ width: '100%' }} />
                                 </Form.Item>
                             </Col>
                         </Row>
 
                         <Row gutter={16}>
                             <Col span={12}>
-                                <Form.Item label="Phone Number" name="phone_number" rules={[{ required: true, message: 'Please input your phone number!' }]}>
+                                {/* <Form.Item label="Phone Number" name="phone_number" rules={[{ required: true, message: 'Please input your phone number!' }]}>
                                     <Input name="phone_number" value={formData.phone_number} onChange={handleChange} placeholder="Enter your phone number" />
+                                </Form.Item> */}
+                                <Form.Item label="Phone Number">
+                                    <Input value={formData.phone_number} readOnly />
                                 </Form.Item>
                             </Col>
                             <Col span={12}>
-                                <Form.Item label="Current Pets Count" name="current_pets_count" rules={[{ required: true, message: 'Please input your current pets count!' }]}>
-                                    <InputNumber name="current_pets_count" value={formData.current_pets_count} min={0} onChange={(value) => handleSelectChange(value, 'current_pets_count')} placeholder="Enter current pets count (0 if none)" style={{ width: '100%' }} />
+                                {/* <Form.Item label="Current Pets Count" name="current_pets_count" rules={[{ required: true, message: 'Please input your current pets count!' }]}>
+                                    <InputNumber name="current_pets_count" value={formData.NoOfPets} min={0} onChange={(value) => handleSelectChange(value, 'current_pets_count')} placeholder="Enter current pets count (0 if none)" style={{ width: '100%' }} />
+                                </Form.Item> */}
+                                <Form.Item label="Current Number of Pets">
+                                    <Input value={formData.NoOfPets} readOnly />
                                 </Form.Item>
                             </Col>
                         </Row>
@@ -145,8 +159,8 @@ function ApplyAdoption() {
 
                         <Row gutter={16}>
                             <Col span={24}>
-                                <Form.Item label="Landlord Requirement" name="landlord_requirement">
-                                    <TextArea name="landlord_requirement" value={formData.landlord_requirement} onChange={handleChange} rows={3} placeholder="Specify landlord requirements regarding pets (if any)" />
+                                <Form.Item label="Landlord Requirement" name="landlord_requirement" rules={[{ required: true, message: 'Please describe your landlord requirements (State None if not applicable)!' }]}>
+                                    <TextArea name="landlord_requirement" value={formData.landlord_requirement} onChange={handleChange} rows={3} placeholder="Specify landlord requirements regarding pets (if any) (state none if not applicable)" />
                                 </Form.Item>
                             </Col>
                         </Row>

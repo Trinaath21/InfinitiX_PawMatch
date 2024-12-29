@@ -4,7 +4,6 @@ import { PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useNavigate, useParams } from "react-router-dom";
 
-
 function AddAdoption() {
     const { TextArea } = Input;
     const { Title } = Typography;
@@ -14,6 +13,17 @@ function AddAdoption() {
     const [fileList, setFileList] = useState([]);
     const [collapsed, setCollapsed] = useState(false);
     const navigate = useNavigate();
+    const role = localStorage.getItem('role');
+    const isByShelter = false;
+    const id = 0;
+    if (role === "shelter"){
+        isByShelter = true;
+        id = parseInt(localStorage.getItem('shelter_id'), 10)
+    }
+    else{
+        isByShelter = false;
+        id = parseInt(localStorage.getItem('user_id'), 10)
+    }
     // const { id } = useParams(); // Extract `id` from the URL (set up routing to include this)
     // const id = id || 1;
 
@@ -40,7 +50,9 @@ function AddAdoption() {
         currentLocation: '',
         extra_info: '',
         adoptionFee: 0,
+        isFromShelter: isByShelter,
         image: null,
+        id: id,
     });
 
     const stateDistrictData = [
@@ -297,10 +309,10 @@ function AddAdoption() {
         requestData.append('extra_info', formData.extra_info);
         requestData.append('adoptionFee', formData.adoptionFee);
         requestData.append('status', 'available');
-        requestData.append('isFromShelter', 'no');
+        requestData.append('isFromShelter', formData.isFromShelter);
         //const id = localStorage.getItem('userId') || 21; // Fallback to 21 if no user ID is found
         //requestData.append('id', id);
-        requestData.append('id', 21);
+        requestData.append('id', formData.id);
 
         // Attach the image file
 

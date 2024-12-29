@@ -5,6 +5,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import FooterBar from '../GeneralComponents/FooterBar';
 import Sidebar from '../GeneralComponents/SideBar';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Select } from "antd";
 
 
 
@@ -34,11 +35,12 @@ function EditDonation() {  //{ shelterId = 4 }
   const fetchDonationDetails = async (id) => {
     try {
       const response = await axios.get(`http://localhost:8000/api/donations/${id}`);
-      const { account_owner_name, account_number, qr_code } = response.data;
+      const { account_owner_name, account_number, qr_code, bank } = response.data;
 
       form.setFieldsValue({
         accountOwnerName: account_owner_name,
         accountNumber: account_number,
+        bank: bank,
       });
 
       if (qr_code) {
@@ -76,6 +78,7 @@ function EditDonation() {  //{ shelterId = 4 }
     const formData = new FormData();
     formData.append('accountOwnerName', values.accountOwnerName);
     formData.append('accountNumber', values.accountNumber);
+    formData.append('bank', values.bank);
 
     if (fileList[0].originFileObj && fileList[0].originFileObj instanceof File) {
       // If a new file is uploaded, append the File object directly
@@ -181,7 +184,32 @@ function EditDonation() {  //{ shelterId = 4 }
                 </Col>
     
                 <Row justify="center" style={{ width: '100%' }}>
-                  <Col xs={24} sm={12} style={{ display: 'flex', justifyContent: 'center' }}>
+
+                <Col xs={24} sm={12}>
+                  <Form.Item
+                    label="Select Bank"
+                    name="bank"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please select a bank",
+                      },
+                    ]}
+                  >
+                    <Select placeholder="Select a bank">
+                      <Select.Option value="Maybank">Maybank</Select.Option>
+                      <Select.Option value="CIMB Bank">CIMB Bank</Select.Option>
+                      <Select.Option value="Public Bank">Public Bank</Select.Option>
+                      <Select.Option value="RHB Bank">RHB Bank</Select.Option>
+                      <Select.Option value="Hong Leong Bank">Hong Leong Bank</Select.Option>
+                      <Select.Option value="Ambank">Ambank</Select.Option>
+                      <Select.Option value="Bank Islam">Bank Islam</Select.Option>
+                      <Select.Option value="Bank Rakyat">Bank Rakyat</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+
+                  <Col xs={24} sm={12} style={{ paddingLeft: "20px" }}>
                     <Form.Item
                       label="Upload QR Code"
                       name="qr_code"

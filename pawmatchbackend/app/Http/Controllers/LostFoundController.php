@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon; // Import Carbon
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 class LostFoundController extends Controller
 {
 
@@ -76,11 +77,28 @@ class LostFoundController extends Controller
                 ], 500);
             }
         }
+        public static function convert_from_latin1_to_utf8_recursively($dat)
+        {
+            if (is_string($dat)) {
+                return utf8_encode($dat);
+            } elseif (is_array($dat)) {
+                $ret = [];
+                foreach ($dat as $i => $d) $ret[$i] = self::convert_from_latin1_to_utf8_recursively($d);
+        
+                return $ret;
+            } elseif (is_object($dat)) {
+                foreach ($dat as $i => $d) $dat->$i = self::convert_from_latin1_to_utf8_recursively($d);
+        
+                return $dat;
+            } else {
+                return $dat;
+            }
+        }
+        
         public function addReplyReport(Request $request)
         {
             // Validation rules
             $validator = Validator::make($request->all(), [
-                'user_id' => 'required|integer',
                 'name' => 'required|string|max:255',
                 'report_id' => 'required|integer',
                 'reportedDate' => 'required|date',
@@ -104,33 +122,36 @@ class LostFoundController extends Controller
             }
         
             try {
+                // Convert input data to UTF-8 recursively
+                $requestData = self::convert_from_latin1_to_utf8_recursively($request->all());
+        
                 $imageBinary = null; // Default to null if no file is provided
-
+        
                 // Process the uploaded file
                 if ($request->hasFile('images')) {
                     $file = $request->file('images');
-                    
+                    Log::info('Image file: ' . $file);
                     // Convert the file to binary and encode it as Base64
                     $imageBinary = file_get_contents($request->file('images')->getRealPath());
-
+                    Log::info('Image binary: ' . $imageBinary);
                 }
         
                 // Insert data into the replylostreport table
                 DB::table('replylostreport')->insert([
-                    'user_id' => $request->user_id,
-                    'name' => $request->name,
-                    'report_id' => $request->report_id,
-                    'reportedDate' => $request->reportedDate,
-                    'phoneNumber' => $request->phoneNumber,
-                    'email' => $request->email,
-                    'detailed_address' => $request->detailed_address,
-                    'last_seen_location' => $request->location,
-                    'district' => $request->district,
-                    'state' => $request->state,
-                    'lat' => $request->lat,
-                    'lng' => $request->lng,
-                    'description' => $request->description,
-                    'image' => $imageBinary, // Store binary image data directly
+                    'user_id' => $requestData['user_id'] ?? null,
+                    'name' => $requestData['name'],
+                    'report_id' => $requestData['report_id'],
+                    'reportedDate' => $requestData['reportedDate'],
+                    'phoneNumber' => $requestData['phoneNumber'],
+                    'email' => $requestData['email'],
+                    'detailed_address' => $requestData['detailed_address'],
+                    'last_seen_location' => $requestData['location'],
+                    'district' => $requestData['district'],
+                    'state' => $requestData['state'],
+                    'lat' => $requestData['lat'],
+                    'lng' => $requestData['lng'],
+                    'description' => $requestData['description'],
+                    'image' => $imageBinary ?? null, // Store binary image data directly
                 ]);
         
                 return response()->json([
@@ -142,7 +163,71 @@ class LostFoundController extends Controller
                     'success' => false,
                     'message' => 'Failed to add reply report.',
                     'error' => $e->getMessage(),
-                    'value'=>$request->input('images')
+                ], 500);
+            }
+        }
+
+
+        public function addReplyReportGuest(Request $request)
+        {
+            // Validation rules
+            $validator = Validator::make($request->all(), [
+                'name' => 'required|string|max:255',
+                'report_id' => 'required|integer',
+                'reportedDate' => 'required|date',
+                'phoneNumber' => 'required|string|max:15',
+                'email' => 'required|email|max:255',
+                'detailed_address' => 'required|string',
+                'location' => 'required|string',
+                'district' => 'required|string',
+                'state' => 'required|string',
+                'lat' => 'nullable|numeric',
+                'lng' => 'nullable|numeric',
+                'description' => 'required|string',
+            ]);
+        
+            // Handle validation failure
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors(),
+                ], 400);
+            }
+        
+            try {
+                // Convert input data to UTF-8 recursively
+                $requestData = self::convert_from_latin1_to_utf8_recursively($request->all());
+        
+                $imageBinary = null; // Default to null if no file is provided
+        
+                $imageBinary = file_get_contents($request->file('images')->getPathname());
+        
+                // Insert data into the replylostreport table
+                DB::table('replylostreport')->insert([
+                    'name' => $requestData['name'],
+                    'report_id' => $requestData['report_id'],
+                    'reportedDate' => $requestData['reportedDate'],
+                    'phoneNumber' => $requestData['phoneNumber'],
+                    'email' => $requestData['email'],
+                    'detailed_address' => $requestData['detailed_address'],
+                    'last_seen_location' => $requestData['location'],
+                    'district' => $requestData['district'],
+                    'state' => $requestData['state'],
+                    'lat' => $requestData['lat'],
+                    'lng' => $requestData['lng'],
+                    'description' => $requestData['description'],
+                     'image' => $imageBinary ?? null, // Store binary image data directly
+                ]);
+        
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Reply report added successfully.',
+                ], 201);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to add reply report.',
+                    'error' => $e->getMessage(),
                 ], 500);
             }
         }

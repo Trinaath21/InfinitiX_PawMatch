@@ -17,7 +17,7 @@ const PublicLostPetListings = () => {
   const [loading, setLoading] = useState(true);
   const[reportData,setReportData] = useState([]);
   const [districtOptions, setDistrictOptions] = useState([]);
-  const role = parseInt(localStorage.getItem('role'), 10);
+  const role = localStorage.getItem('role');
   const userID =
     role === "guest" ? 9999999 : parseInt(localStorage.getItem("user_id"), 10);
   const itemsPerPage = 6;

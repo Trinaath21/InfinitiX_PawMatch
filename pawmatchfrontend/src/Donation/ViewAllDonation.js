@@ -5,12 +5,9 @@ import { Modal, Typography, CardMedia, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { Layout, Select } from "antd";
-import { EyeOutlined, ExclamationCircleOutlined} from '@ant-design/icons';
+import { EyeOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
-import Sidebar from "../GeneralComponents/SideBar.js";
-import FooterBar from "../GeneralComponents/FooterBar.js";
-
 
 const { Option } = Select;
 
@@ -48,7 +45,7 @@ const theme = createTheme({
 });
 
 function ViewAllDonation() {
-  const { Content, Footer, Sider } = Layout;
+  const { Content } = Layout;
   const [collapsed, setCollapsed] = useState(false);
   const toggleCollapse = () => setCollapsed(!collapsed);
 
@@ -65,7 +62,7 @@ function ViewAllDonation() {
       .then((response) => {
         const updatedShelters = response.data.map((shelter) => ({
           ...shelter,
-          location: `${shelter.address}, ${shelter.district}, ${shelter.state}`,
+          location: `${shelter.detailed_address}, ${shelter.district}, ${shelter.state}`,
         }));
         setShelter(updatedShelters);
 
@@ -98,7 +95,7 @@ function ViewAllDonation() {
       });
   };
 
-   const filteredShelters = shelter.filter((item) =>
+  const filteredShelters = shelter.filter((item) =>
     selectedDistrict ? item.district === selectedDistrict : true
   );
 
@@ -118,27 +115,26 @@ function ViewAllDonation() {
             <button
               onClick={() => handleViewMore(shelter_id)}
               style={{
-                backgroundColor: '#e6f7ff',
-                color: '#1890ff',
-                borderColor: '#91d5ff',
-                padding: '5px 10px',
-                borderRadius: '5px',
-                border: '1px solid',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
+                backgroundColor: "#e6f7ff",
+                color: "#1890ff",
+                borderColor: "#91d5ff",
+                padding: "5px 10px",
+                borderRadius: "5px",
+                border: "1px solid",
+                cursor: "pointer",
+                fontWeight: "bold",
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
               }}
             >
-              <EyeOutlined style={{ color: '#1890ff' }} />
+              <EyeOutlined style={{ color: "#1890ff" }} />
               View More
             </button>
           );
         },
       },
-    }
-    
+    },
   ];
 
   const options = {
@@ -150,14 +146,30 @@ function ViewAllDonation() {
     viewColumns: true,
     search: true,
     customToolbar: () => (
-      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          width: "100%",
+        }}
+      >
         {/* Toolbar Icons (Search, View Columns) */}
-        <div style={{ display: "flex", justifyContent: "flex-end", flexGrow: 1 }}>
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", flexGrow: 1 }}
+        >
           {/* This part is handled by MUI, no need to define custom icons */}
         </div>
-  
+
         {/* District Dropdown placed near the icons */}
-        <div style={{ display: "flex", alignItems: "center", marginLeft: "auto", marginTop: "5px" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            marginLeft: "auto",
+            marginTop: "5px",
+          }}
+        >
           <Select
             placeholder="Select District"
             style={{
@@ -182,102 +194,113 @@ function ViewAllDonation() {
 
   return (
     <>
-    {/* <Layout style={{ minHeight: "100vh", overflow: "hidden" }}>
+      {/* <Layout style={{ minHeight: "100vh", overflow: "hidden" }}>
       <Sidebar collapsed={collapsed} toggleCollapse={toggleCollapse} /> */}
-     
-        <Content style={{ margin: "24px 16px 0" }}>
-          <div
-            style={{
-              width: "100%",
-              maxWidth: "1200px",
-              padding: "0px",
-              background: "#transparent",
-              borderRadius: "8px",
-              margin: "auto",
-            }}
-          >
 
-            <CacheProvider value={muiCache}>
-              <ThemeProvider theme={theme}>
-                <MUIDataTable
-                  title={<Typography variant="h6">Shelters</Typography>}
-                  data={filteredShelters}
-                  columns={columns}
-                  options={options}
-                />
-              </ThemeProvider>
-            </CacheProvider>
-          </div>
-        </Content>
-        {/* <FooterBar /> */}
-      
-      {isModalOpen && (
-      <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Content style={{ margin: "24px 16px 0" }}>
         <div
           style={{
-            padding: "20px",
-            backgroundColor: "white",
-            margin: "100px auto",
-            width: "400px",
-            maxHeight: "80vh", // Limit the height to 80% of the viewport height
-            overflow: "auto", // Enable scrolling if content exceeds the height
-            position: "relative",
+            width: "100%",
+            maxWidth: "1200px",
+            padding: "0px",
+            background: "#transparent",
             borderRadius: "8px",
+            margin: "auto",
           }}
         >
-          {/* Close button */}
-          <IconButton
-            aria-label="close"
-            onClick={() => setIsModalOpen(false)}
+          <CacheProvider value={muiCache}>
+            <ThemeProvider theme={theme}>
+              <MUIDataTable
+                title={<Typography variant="h6">Shelters</Typography>}
+                data={filteredShelters}
+                columns={columns}
+                options={options}
+              />
+            </ThemeProvider>
+          </CacheProvider>
+        </div>
+      </Content>
+      {/* <FooterBar /> */}
+
+      {isModalOpen && (
+        <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          <div
             style={{
-              position: "absolute",
-              top: "10px",
-              right: "10px",
+              padding: "20px",
+              backgroundColor: "white",
+              margin: "100px auto",
+              width: "400px",
+              maxHeight: "80vh", // Limit the height to 80% of the viewport height
+              overflow: "auto", // Enable scrolling if content exceeds the height
+              position: "relative",
+              borderRadius: "8px",
             }}
           >
-            <CloseIcon />
-          </IconButton>
-          
-          {donationDetails && Object.keys(donationDetails).length > 0 ? (
-            <>
-              <Typography variant="h6" gutterBottom align="center" sx={{ fontWeight: "bold" }}>
-                Donation Details
-              </Typography>
-              <p>Account Owner Name: {donationDetails.account_owner_name || "N/A"}</p>
-              <p>Account Number: {donationDetails.account_number || "N/A"}</p>
-              {donationDetails.qr_code ? (
-                <CardMedia
-                  component="img"
-                  image={donationDetails.qr_code}
-                  alt="QR Code"
-                  style={{ width: "100%", height: "auto", marginTop: "10px" }}
-                />
-              ) : (
-                <p>No QR Code available</p>
-              )}
-            </>
-          ) : (
-            <div style={{ textAlign: "center", marginTop: "80px" }}>
-              <ExclamationCircleOutlined
-                style={{
-                  fontSize: "48px",
-                  color: "#ff4d4f", 
-                  marginBottom: "20px",
-                }}
-              />
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
-                No donation details available for this shelter.
-              </Typography>
-            </div>
-          )}
-        </div>
-      </Modal>
-    )}
+            {/* Close button */}
+            <IconButton
+              aria-label="close"
+              onClick={() => setIsModalOpen(false)}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
 
-    {/* </Layout> */}
+            {donationDetails && Object.keys(donationDetails).length > 0 ? (
+              <>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  align="center"
+                  sx={{ fontWeight: "bold" }}
+                >
+                  Donation Details
+                </Typography>
+                <p>
+                  Account Owner Name:{" "}
+                  {donationDetails.account_owner_name || "N/A"}
+                </p>
+                <p>Account Number: {donationDetails.account_number || "N/A"}</p>
+                <p>Bank: {donationDetails.bank || "N/A"}</p>
+                {donationDetails.qr_code ? (
+                  <CardMedia
+                    component="img"
+                    image={donationDetails.qr_code}
+                    alt="QR Code"
+                    style={{ width: "100%", height: "auto", marginTop: "10px" }}
+                  />
+                ) : (
+                  <p>No QR Code available</p>
+                )}
+              </>
+            ) : (
+              <div style={{ textAlign: "center", marginTop: "80px" }}>
+                <ExclamationCircleOutlined
+                  style={{
+                    fontSize: "48px",
+                    color: "#ff4d4f", // Eye-catching red color for the icon
+                    marginBottom: "20px",
+                  }}
+                />
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{ fontWeight: "bold" }}
+                >
+                  No donation details available for this shelter.
+                </Typography>
+              </div>
+            )}
+          </div>
+        </Modal>
+      )}
+
+      {/* </Layout> */}
     </>
   );
 }
 
 export default ViewAllDonation;
-

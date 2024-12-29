@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\AdoptionApplication;
 use App\Models\Member;
+use App\Models\PetAdoptionPost;
+use Illuminate\Support\Facades\Mail;
 
 class AdoptionApplicationController extends Controller
 {
@@ -19,7 +21,7 @@ class AdoptionApplicationController extends Controller
         }
 
         // Fetch the user's address details from the `member` table
-        $member = Member::select('detailed_address', 'district', 'state')
+        $member = Member::select('name', 'phone_number', 'NoOfPets', 'detailed_address', 'district', 'state')
             ->where('user_id', $id)
             ->first();
 
@@ -99,10 +101,10 @@ class AdoptionApplicationController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'applicant_name' => 'required|string|max:255',
-            'applicant_age' => 'required|integer|min:0',
+            'name' => 'required|string|max:255',
+            'age' => 'required|integer|min:0',
             'phone_number' => 'required|string|max:20',
-            'current_pets_count' => 'required|integer|min:0',
+            'NoOfPets' => 'required|integer|min:0',
             'previous_pet_experience' => 'required|string',
             'living_condition' => 'required|string',
             'landlord_requirement' => 'string',
@@ -123,10 +125,10 @@ class AdoptionApplicationController extends Controller
         $application->adoption_post_id = $validatedData['adoption_post_id'];
         $application->user_id = $validatedData['user_id'];
         //$application->user_id = 21;
-        $application->applicant_name = $validatedData['applicant_name'];
-        $application->applicant_age = $validatedData['applicant_age'];
+        $application->applicant_name = $validatedData['name'];
+        $application->applicant_age = $validatedData['age'];
         $application->phone_number = $validatedData['phone_number'];
-        $application->current_pets_count = $validatedData['current_pets_count'];
+        $application->current_pets_count = $validatedData['NoOfPets'];
         $application->previous_pet_experience = $validatedData['previous_pet_experience'];
         $application->detailed_address = $validatedData['detailed_address'];
         $application->district = $validatedData['district'];
@@ -143,6 +145,123 @@ class AdoptionApplicationController extends Controller
             'message' => 'Adoption application submitted successfully!',
             'data' => $application,
         ], 201);
+    }
+
+    public function acceptApplication(Request $request)
+    {
+        $applicationId = $request->input('application_id');
+        $adoptionPostId = $request->input('adoption_post_id');
+
+        try {
+            // Accept the selected application
+            $acceptedApplication = AdoptionApplication::where('application_id', $applicationId)
+                ->where('adoption_post_id', $adoptionPostId)
+                ->first();
+
+            if (!$acceptedApplication) {
+                return response()->json(['error' => 'Application not found'], 404);
+            }
+
+            $acceptedApplication->status = 'approved';
+            $acceptedApplication->save();
+
+            // Update the status of the adoption post to "adopted"
+            $adoptionPost = PetAdoptionPost::where('adoption_post_id', $adoptionPostId)->first();
+            if ($adoptionPost) {
+                $adoptionPost->status = 'adopted';
+                $adoptionPost->save();
+            }
+
+            // Fetch the pet name
+            $petName = $adoptionPost ? $adoptionPost->name : 'the pet';
+
+            // Notify the accepted applicant
+            $acceptedMemberEmail = Member::where('user_id', $acceptedApplication->user_id)->value('email');
+            if ($acceptedMemberEmail) {
+                Mail::send('application_status', [
+                    'status' => 'accepted',
+                    'petName' => $petName,
+                ], function ($message) use ($acceptedMemberEmail) {
+                    $message->to($acceptedMemberEmail)
+                        ->subject('Adoption Application Status');
+                });
+            }
+
+            // Reject all other applications for the same adoption post and notify them
+            $rejectedApplications = AdoptionApplication::where('adoption_post_id', $adoptionPostId)
+                ->where('application_id', '!=', $applicationId)
+                ->where('status', 'pending')
+                ->get();
+
+            foreach ($rejectedApplications as $rejectedApplication) {
+                // Update status to "rejected"
+                $rejectedApplication->status = 'rejected';
+                $rejectedApplication->save();
+
+                // Notify the rejected applicant
+                $rejectedMemberEmail = Member::where('user_id', $rejectedApplication->user_id)->value('email');
+                if ($rejectedMemberEmail) {
+                    Mail::send('application_status', [
+                        'status' => 'rejected',
+                        'petName' => $petName,
+                    ], function ($message) use ($rejectedMemberEmail) {
+                        $message->to($rejectedMemberEmail)
+                            ->subject('Adoption Application Status');
+                    });
+                }
+            }
+
+            return response()->json([
+                'message' => 'Application accepted, post marked as adopted, and other applications rejected with notifications sent.',
+                'accepted_application' => $acceptedApplication,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to process the application', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+
+    public function rejectApplication(Request $request)
+    {
+        $applicationId = $request->input('application_id');
+        $adoptionPostId = $request->input('adoption_post_id');
+
+        try {
+            // Find the specific application
+            $application = AdoptionApplication::where('application_id', $applicationId)
+                ->where('adoption_post_id', $adoptionPostId)
+                ->first();
+
+            if (!$application) {
+                return response()->json(['error' => 'Application not found'], 404);
+            }
+
+            // Update the status to "rejected"
+            $application->status = 'rejected';
+            $application->save();
+
+            // Fetch member email and pet name
+            $memberEmail = Member::where('user_id', $application->user_id)->value('email');
+            $petName = PetAdoptionPost::where('adoption_post_id', $adoptionPostId)->value('name');
+
+            // Send rejection email
+            if ($memberEmail) {
+                Mail::send('application_status', [
+                    'status' => 'rejected',
+                    'petName' => $petName,
+                ], function ($message) use ($memberEmail) {
+                    $message->to($memberEmail)
+                        ->subject('Adoption Application Status');
+                });
+            }
+
+            return response()->json([
+                'message' => 'Application rejected successfully.',
+                'rejected_application' => $application,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to reject the application', 'details' => $e->getMessage()], 500);
+        }
     }
 
 }

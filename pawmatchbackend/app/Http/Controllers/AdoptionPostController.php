@@ -31,6 +31,7 @@ class AdoptionPostController extends Controller
             'currentLocation' => 'required|string',
             'extra_info' => 'nullable|string',
             'adoptionFee' => 'nullable|numeric|min:0',
+            'isFromShelter' => 'required|boolean',
             'petImage' => 'required|image|mimes:jpeg,png,jpg,gif|max:1000000',
         ]);
 
@@ -53,7 +54,8 @@ class AdoptionPostController extends Controller
         $post->adoption_fee = $validatedData['adoptionFee'];
         $post->id = $id;  // Temporary user ID
         $post->status = 'available';
-        $post->isFromShelter = 0;
+        $post->isFromShelter = $validatedData['isFromShelter'];
+        ;
 
         if ($request->hasFile('petImage')) {
             Log::info("Image file exists.");
@@ -123,9 +125,9 @@ class AdoptionPostController extends Controller
         if ($request->hasFile('petImage')) {
             $adoptionPost->petImage = file_get_contents($request->file('petImage')->getRealPath());
         }
-
+        //Log::info($adoptionPost);
         $adoptionPost->save();
-
+        
         return response()->json(['message' => 'Adoption post updated successfully']);
     }
 
@@ -147,18 +149,63 @@ class AdoptionPostController extends Controller
     //     return response()->json($posts);
     // }
 
+    // public function getPostsByUser(Request $request)
+    // {
+    //     $id = $request->query('id');
+
+    //     if (!$id) {
+    //         return response()->json([
+    //             'error' => 'id query parameter is required.'
+    //         ], 400);
+    //     }
+
+    //     // Fetch posts based on the provided user ID
+    //     $posts = PetAdoptionPost::where('id', $id)->get();
+
+    //     if ($posts->isEmpty()) {
+    //         return response()->json(['error' => 'No posts found for this user'], 404);
+    //     }
+
+    //     // Process each post to handle the pet image
+    //     $posts = $posts->map(function ($post) {
+    //         if ($post->petImage) {
+    //             // Determine MIME type for the image data
+    //             $mimeType = finfo_buffer(finfo_open(), $post->petImage, FILEINFO_MIME_TYPE);
+
+    //             // Encode the image as Base64 and attach it with the MIME type
+    //             $post->petImage = 'data:' . $mimeType . ';base64,' . base64_encode($post->petImage);
+    //         }
+    //         return $post;
+    //     });
+
+    //     return response()->json($posts, 200);
+    // }
+
     public function getPostsByUser(Request $request)
     {
         $id = $request->query('id');
+        $role = $request->query('role');
 
-        if (!$id) {
+        if (!$id || !$role) {
             return response()->json([
-                'error' => 'id query parameter is required.'
+                'error' => 'Both id and role query parameters are required.'
             ], 400);
         }
 
-        // Fetch posts based on the provided user ID
-        $posts = PetAdoptionPost::where('id', $id)->get();
+        // Fetch posts based on user ID and role
+        $query = PetAdoptionPost::where('id', $id);
+
+        if ($role === 'member') {
+            $query->where('isFromShelter', 0);
+        } elseif ($role === 'shelter') {
+            $query->where('isFromShelter', 1);
+        } else {
+            return response()->json([
+                'error' => 'Invalid role specified. Valid roles are "member" or "shelter".'
+            ], 400);
+        }
+
+        $posts = $query->get();
 
         if ($posts->isEmpty()) {
             return response()->json(['error' => 'No posts found for this user'], 404);
@@ -211,6 +258,38 @@ class AdoptionPostController extends Controller
         return response()->json($posts, 200);
     }
 
+    // public function getPostsAndApplications(Request $request)
+    // {
+    //     $id = $request->query('id');
+
+    //     if (!$id) {
+    //         return response()->json([
+    //             'error' => 'id query parameter is required.'
+    //         ], 400);
+    //     }
+
+    //     // Fetch posts based on user ID
+    //     $posts = PetAdoptionPost::where('id', $id)->get();
+
+    //     // Process each post to handle the pet image
+    //     $posts = $posts->map(function ($post) {
+    //         if ($post->petImage) {
+    //             $mimeType = finfo_buffer(finfo_open(), $post->petImage, FILEINFO_MIME_TYPE);
+    //             $post->petImage = 'data:' . $mimeType . ';base64,' . base64_encode($post->petImage);
+    //         }
+    //         return $post;
+    //     });
+
+    //     // Fetch adoption applications based on user ID
+    //     $applications = AdoptionApplication::where('user_id', $id)->get();
+
+    //     // Combine both datasets and send as a single response
+    //     return response()->json([
+    //         'posts' => $posts,
+    //         'applications' => $applications,
+    //     ], 200);
+    // }
+
     public function getPostsAndApplications(Request $request)
     {
         $id = $request->query('id');
@@ -221,8 +300,14 @@ class AdoptionPostController extends Controller
             ], 400);
         }
 
-        // Fetch posts based on user ID
-        $posts = PetAdoptionPost::where('id', $id)->get();
+        // Fetch posts excluding rows where both user_id = $id AND isFromShelter = 0
+        $posts = PetAdoptionPost::where(function ($query) use ($id) {
+            // Exclude rows where user_id matches and isFromShelter is 0
+            $query->where(function ($query) use ($id) {
+                $query->where('id', '!=', $id) // Exclude matching user_id
+                    ->orWhere('isFromShelter', '=', 1); // Include shelter posts
+            });
+        })->get();
 
         // Process each post to handle the pet image
         $posts = $posts->map(function ($post) {
@@ -242,7 +327,6 @@ class AdoptionPostController extends Controller
             'applications' => $applications,
         ], 200);
     }
-
 
     public function deleteAdoptionPost(Request $request)
     {

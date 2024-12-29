@@ -11,9 +11,10 @@ class DonationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            //'shelterId' => 'required|integer',
+            'shelterId' => 'required|integer',
             'accountOwnerName' => 'required|string',
             'accountNumber' => 'required|string',
+            'bank' => 'required|string',
             'qrImage' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
             
         ]);
@@ -22,9 +23,10 @@ class DonationController extends Controller
         $qrCodePath = file_get_contents(($request->file('qrImage'))->getPathname());
         // ->store('qrcodes', 'public');
 
-        $shelterId = 5;
+        //$shelterId = 5;
 
         \Log::info($qrCodePath);
+        $shelterId = $request->shelterId;
 
         // Create donation record
         ShelterDonation::create([
@@ -32,6 +34,7 @@ class DonationController extends Controller
             'qr_code' => $qrCodePath,
             'account_owner_name' => $request->accountOwnerName,
             'account_number' => $request->accountNumber,
+            'bank' => $request->bank,
         ]);
 
         return response()->json(['message' => 'Donation details added successfully'], 201);
@@ -54,6 +57,7 @@ class DonationController extends Controller
         return response()->json([
             'account_owner_name' => $donation->account_owner_name,
             'account_number' => $donation->account_number,
+            'bank' => $donation->bank,
             'qr_code' => 'data:' . $mimeType . ';base64,' . base64_encode($donation->qr_code)
         ], 200);
         
@@ -67,6 +71,7 @@ class DonationController extends Controller
         $request->validate([
             'accountOwnerName' => 'required|string',
             'accountNumber' => 'required|string',
+            'bank' => 'required|string',
             'qr_code' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         
@@ -81,6 +86,7 @@ class DonationController extends Controller
 
         $donation->account_owner_name = $request->accountOwnerName;
         $donation->account_number = $request->accountNumber;
+        $donation->bank = $request->bank;
 
         // Update QR code image if a new one is uploaded
         if ($request->hasFile('qr_code')) {
@@ -128,6 +134,7 @@ class DonationController extends Controller
     return response()->json([
         'account_owner_name' => $donation->account_owner_name,
         'account_number' => $donation->account_number,
+        'bank' => $donation->bank,
         'qr_code' => 'data:image/png;base64,' . base64_encode($donation->qr_code),
     ], 200);
 }

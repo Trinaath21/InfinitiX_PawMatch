@@ -224,10 +224,16 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
                 for (let [key, value] of formData.entries()) {
                     console.log(`${key}: ${value}`);
                 }
-                
-                const response = await axios.post('http://localhost:8000/api/addReplyReport', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
+                if(role ==="guest"){
+                    const response = await axios.post('http://localhost:8000/api/addReplyReportGuest', formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                }else{
+                    const response = await axios.post('http://localhost:8000/api/addReplyReport', formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                }
+
                 message.success('Reply report submitted successfully!');
                 await axios.post('http://localhost:8000/api/notify-reportOwner', {
                     reportID: report_id,

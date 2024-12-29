@@ -131,7 +131,7 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
     const [location, setLocation] = useState(null);
-    const role = parseInt(localStorage.getItem('role'), 10);
+    const role = localStorage.getItem('role');
     const userID = role === 'guest' ? 9999999 : parseInt(localStorage.getItem('user_id'), 10);
 
     useEffect(() => {
@@ -224,10 +224,16 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
                 for (let [key, value] of formData.entries()) {
                     console.log(`${key}: ${value}`);
                 }
-                
-                const response = await axios.post('http://localhost:8000/api/addReplyReport', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
-                });
+                if(role ==="guest"){
+                    const response = await axios.post('http://localhost:8000/api/addReplyReportGuest', formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                }else{
+                    const response = await axios.post('http://localhost:8000/api/addReplyReport', formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                }
+
                 message.success('Reply report submitted successfully!');
                 await axios.post('http://localhost:8000/api/notify-reportOwner', {
                     reportID: report_id,
@@ -305,7 +311,7 @@ const AddReplyReport = ({ visible, onClose,report_id }) => {
                         >
                             <Input
                                 name="phoneNumber"
-                                disabled={!!userData?.phoneNumber}
+                                disabled={!!userData?.phone_number}
                                 onChange={formik.handleChange}
                                 onBlur={formik.handleBlur}
                                 value={formik.values.phoneNumber}
