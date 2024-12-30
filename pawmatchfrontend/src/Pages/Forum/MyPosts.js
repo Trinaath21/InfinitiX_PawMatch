@@ -92,7 +92,7 @@ useEffect(() => {
      // const userId = 1;
       //const response = await axios.get('http://localhost:8000/user/posts/1'); // Replace with your actual API endpoint
       // Example: Fetch the current user's role and ID
-      const currentUser = { role: localStorage.getItem('role'), id: null, shelter_id: 1}; // Replace with actual user context
+      const currentUser = {  role: localStorage.getItem('role'), id: localStorage.getItem("user_id"), shelter_id: localStorage.getItem("shelter_id")}; // Replace with actual user context
       let endpoint;
 
       // Determine the API endpoint based on the role
@@ -232,7 +232,7 @@ const UserPostModal = ({
   const fetchUserPosts = async () => {
     try {
 
-      const currentUser = { role: localStorage.getItem('role'),  id: null, shelter_id: 1 };
+      const currentUser = { role: localStorage.getItem('role'),  id: localStorage.getItem("user_id"), shelter_id: localStorage.getItem("shelter_id")};
       let endpoint;
       //const response = await axios.get("http://localhost:8000/user/posts/1"); // Temporary user_id: 1
       // Determine the API endpoint based on the user's role
@@ -244,8 +244,11 @@ const UserPostModal = ({
         throw new Error("Invalid user role");
     }
     const response = await axios.get(endpoint); // Fetch posts from the API
-
-      setUserPosts(response.data);
+       
+      // Ensure response data is always an array
+      const posts = Array.isArray(response.data) ? response.data : [];
+      setUserPosts(posts);
+      //setUserPosts(response.data);
       setIsEditListVisible(true);
     } catch (error) {
       console.error("Error fetching user posts:", error);
@@ -300,7 +303,7 @@ const UserPostModal = ({
 
  const handleDelete = async (post_id) => {
     try {
-        const response = await axios.delete(`http://localhost:8000/posts/${post_id}`);
+        const response = await axios.delete(`http://localhost:8000/api/posts/${post_id}`);
         
         if (response.status === 200) {
             console.log("Post deleted successfully");
@@ -350,15 +353,15 @@ const handleSubmit = async () => {
         //const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const userRole = localStorage.getItem('role'); 
         if (userRole == "shelter"){
-          formData.append("shelter_id",1);
-          //formData.append("user_id",1);
+          formData.append("shelter_id",localStorage.getItem("shelter_id"));
+         // formData.append("user_id",1);
           formData.append("role",userRole);
         }
         else if (userRole == "member"){
-          formData.append("member_id",1);
+          formData.append("member_id",localStorage.getItem("user_id"));
          // formData.append("user_id",1);
           formData.append("role",userRole);
-        }          
+        }               
         
         //console.log("token: " + csrfToken);
      

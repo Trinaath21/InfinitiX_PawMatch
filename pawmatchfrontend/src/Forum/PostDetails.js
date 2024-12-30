@@ -67,19 +67,11 @@ const PostDetails = () => {
       const memberId = localStorage.getItem('user_id');
       const shelterId = localStorage.getItem('shelter_id');
 console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId);
-     /* const response = await axios.post(
-        `http://localhost:8000/api/posts/${post_id}/comments`,
-        { comment:newComment,
-          role: userRole,
-          shelter_id: userRole === 'shelter' ? 1 : null,
-          member_id: userRole === 'member' ? memberId : null,
-         },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );*/
+    
       const payload = {
         comment: newComment,
         role: userRole,
-        post_id: post_id, // Ensure post_id is part of the payload
+        post_id: post_id, 
       };
   
       if (userRole === "member") {
@@ -127,7 +119,12 @@ console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId)
         <>
           
          <div style={{ marginBottom: '16px' }}>
-         <Avatar src={post?.user?.avatar || 'https://via.placeholder.com/150'} />
+         <Avatar src={
+    post?.member?.profile_picture
+    ? `http://localhost:8000${post.member.profile_picture}`
+    : post?.shelter?.profile_picture
+    ? `http://localhost:8000/storage/${post.shelter.profile_picture}`
+    : "http://www.gravatar.com/avatar/?d=mp"} />
             <span style={{ marginLeft: '8px' }}>{post?.member?.name ||post?.shelter?.shelter_name|| 'Unknown User'}</span>
           </div>
           <h2>{post.title}</h2>
@@ -163,10 +160,16 @@ console.log('Role:', userRole, 'Member ID:', memberId, 'Shelter ID:', shelterId)
             renderItem={comment => (
               <List.Item key={comment.comment_id}>
                 <List.Item.Meta
-                 avatar={<Avatar src={comment?.shelter?.profile_picture || comment?.member?.profile_picture || "https://via.placeholder.com/150"} />}
+                 avatar={<Avatar src={comment?.member?.profile_picture
+                  ? `http://localhost:8000${comment.member.profile_picture}`
+                  : comment?.shelter?.profile_picture
+                  ? `http://localhost:8000/storage/${comment.shelter.profile_picture}`
+                  : "http://www.gravatar.com/avatar/?d=mp"
+              } />}
                  title={comment?.member?.name ||comment?.shelter?.shelter_name||'Anonymous' }
-                 description={comment?.comment || 'No comment available'}
-                />
+                 description={ <span style={{ color: '#697565' }}> {comment?.comment || 'No comment available'} </span>
+                
+             } />
               </List.Item>
             )}
           />

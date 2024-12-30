@@ -242,7 +242,7 @@ const EditMemberProfile = () => {
       .then((response) => {
         message.success("Member Profile updated successfully!");
         //setProfile(response.data.profile);
-        navigate("/main/profiles/member");
+        navigate("/profiles/member");
       })
       .catch((err) => {
         message.error(
@@ -392,7 +392,7 @@ const EditMemberProfile = () => {
           <Button type="primary" htmlType="submit">
             Save Changes
           </Button>
-          <Button onClick={() => navigate("/main/profiles/member")}>
+          <Button onClick={() => navigate("/profiles/member")}>
             Cancel
           </Button>
         </div>

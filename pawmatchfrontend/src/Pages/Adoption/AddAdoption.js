@@ -12,18 +12,21 @@ function AddAdoption() {
     const [previewImage, setPreviewImage] = useState('');
     const [fileList, setFileList] = useState([]);
     const [collapsed, setCollapsed] = useState(false);
+    // const [isByShelter, setIsByShelter] = useState(false);
+    // const [id, setId] = useState(0);
     const navigate = useNavigate();
     const role = localStorage.getItem('role');
-    const isByShelter = false;
-    const id = 0;
-    if (role === "shelter"){
-        isByShelter = true;
-        id = parseInt(localStorage.getItem('shelter_id'), 10)
-    }
-    else{
-        isByShelter = false;
-        id = parseInt(localStorage.getItem('user_id'), 10)
-    }
+    //const id = 0;
+    // if (role === "shelter"){
+    //     setIsByShelter(true);
+    //     setId(parseInt(localStorage.getItem('shelter_id'), 10));
+    // }
+    // else{
+    //     setIsByShelter(false);
+    //     setId(parseInt(localStorage.getItem('user_id'), 10));
+    // }
+    const id = role === 'member' ? parseInt(localStorage.getItem('user_id'), 10) : parseInt(localStorage.getItem('shelter_id'), 10);
+    const isByShelter = role === 'member' ? 0 : 1;
     // const { id } = useParams(); // Extract `id` from the URL (set up routing to include this)
     // const id = id || 1;
 
