@@ -15,12 +15,14 @@ const PersonalStrayListings = () => {
     const [loading, setLoading] = useState(false);
     const [editModalVisible, setEditModalVisible] = useState(false);
     const [selectedReport, setSelectedReport] = useState(null);
+    const userID = parseInt(localStorage.getItem('user_id'), 10);
+    console.log("User ID from localStorage:", userID);
 
     const refreshTableData = async () => {
         setLoading(true); 
         try {
             const response = await axios.post('http://localhost:8000/api/getAllStrayReportsByUserID', {
-                userID: 1 //later must use localStorage.
+                userID: userID //later must use localStorage.
             });
             setData(response.data.data); 
         } catch (error) {
@@ -66,15 +68,15 @@ const PersonalStrayListings = () => {
         { name: "breed", label: "Breed", options: { filter: true, sort: true } },
         { name: "colour", label: "Colour", options: { filter: true, sort: true } },
         { name: "dateSighting", label: "Date of Sighting", options: { filter: true, sort: true } },
-        { name: "status", label: "Status", options: { filter: true, sort: true } },
+        //{ name: "status", label: "Status", options: { filter: true, sort: true } },
         {
             name: "actions",
-            label: "Actions",
+            label: "ACTIONS",
             options: {
                 filter: false,
                 sort: false,
                 customBodyRender: (value, tableMeta) => {
-                    const isActive = tableMeta.rowData[4] === "active"; // Adjust index 3 to your status column position
+                    //const isActive = tableMeta.rowData[4] === "active"; // Adjust index 3 to your status column position
                     console.log("Row Data Report ID:", tableMeta.rowData[0]);
         
                     return (
@@ -96,8 +98,8 @@ const PersonalStrayListings = () => {
                                 onClick={() => handleEdit(tableMeta.rowData[0])}
                                 type="default"
                                 icon={<EditOutlined />}
-                                style={{ color: isActive ? '#fa8c16' : '#d9d9d9', borderColor: isActive ? '#ffd591' : '#d9d9d9' }}
-                                disabled={!isActive}
+                                style={{ color: '#fa8c16' , borderColor:  '#ffd591'  }}
+                                //disabled={!isActive}
                             >
                                 Edit
                             </Button>
@@ -134,7 +136,7 @@ const PersonalStrayListings = () => {
     
     const handleViewMore = (reportID) => {
         console.log("Viewing details for report ID:", reportID);
-        navigate('/ViewMoreStrayDetails', { state: { reportID: reportID } });
+        navigate(`/ViewMoreStrayDetails/${reportID}`);
     };
     const handleEdit = (reportID) => {
         const reportData = data.find((report) => report.report_id === reportID);

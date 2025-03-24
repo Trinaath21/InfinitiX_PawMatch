@@ -178,9 +178,16 @@ const AddStrayReport = ({ visible, onClose,refreshTableData }) => {
                 ),
         }),
         onSubmit: async (values) => {
-            //console.log("hi");
+           
+            const userId = localStorage.getItem('user_id'); // Assuming the user_id is stored in localStorage with key 'user_id'
+
+            if (!userId) {
+                message.error('User ID not found in local storage!');
+                return;
+            }
+
             const formData = new FormData();
-            formData.append('user_id', '1'); // Replace with actual user_id if available
+            formData.append('user_id', userId);
             formData.append('breed', values.breed);
             formData.append('colour', values.colour);
             formData.append('status', values.status);

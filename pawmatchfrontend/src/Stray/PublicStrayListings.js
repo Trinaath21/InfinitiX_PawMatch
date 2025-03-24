@@ -17,14 +17,16 @@ const PublicStrayListings = () => {
   const [loading, setLoading] = useState(true);
   const[reportData,setReportData] = useState([]);
   const [districtOptions, setDistrictOptions] = useState([]);
-
+  const role = parseInt(localStorage.getItem('role'), 10);
+  const userID =
+    role === "guest" ? 9999999 : parseInt(localStorage.getItem("user_id"), 10);
   const itemsPerPage = 6;
   useEffect(() => {
     // Define the function to fetch data
     const fetchReportData = async () => {
       try {
         const response = await axios.post('http://localhost:8000/api/getAllStrayReports',{
-          userID: 2 //later must use localStorage.
+          userID: userID //later must use localStorage.
       }); 
         console.log("report_data",response.data);
         setReportData(response.data.data);
@@ -74,7 +76,8 @@ const PublicStrayListings = () => {
     setPage(page);
   };
   const handleCardClick = (reportID) => {
-    navigate('/ViewMoreStrayDetails', { state: { reportID } }); // Pass the report_id in the state
+    navigate(`/ViewMoreStrayDetails/${reportID}`);
+ // Pass the report_id in the state
   };
 
   return (
