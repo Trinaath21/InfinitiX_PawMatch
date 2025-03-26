@@ -136,8 +136,8 @@ const PersonalStrayListings = () => {
     
     const handleViewMore = (reportID) => {
         console.log("Viewing details for report ID:", reportID);
-        navigate(`/ViewMoreStrayDetails/${reportID}`);
-    };
+        navigate('/ViewMoreStrayDetails', { state: { reportID: reportID } });
+    };
     const handleEdit = (reportID) => {
         const reportData = data.find((report) => report.report_id === reportID);
         console.log(reportData);

@@ -76,7 +76,10 @@ const PublicStrayListings = () => {
     setPage(page);
   };
   const handleCardClick = (reportID) => {
-    navigate(`/ViewMoreStrayDetails/${reportID}`);
+    navigate('/viewMoreStrayDetails', {
+      state: { reportID: reportID, page: "/ViewMoreStrayDetails" },
+    });
+
  // Pass the report_id in the state
   };
 

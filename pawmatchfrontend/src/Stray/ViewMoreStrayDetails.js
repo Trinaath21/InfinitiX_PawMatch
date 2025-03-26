@@ -1,44 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import { Row, Col, Card, Button, Typography, Spin, Select, Modal, Input,Badge,Image  } from 'antd';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
 const ViewMoreStrayDetails = () => {
   const navigate = useNavigate();
+  const role = parseInt(localStorage.getItem('role'), 10);
   const [loading, setLoading] = useState(true);
   const { Title, Text } = Typography;
   const [caseInfo, setCaseInfo] = useState({});
   const [data, setData] = useState({});
-  //const role = parseInt(localStorage.getItem('role'), 10);
-  //const [isBackVisible, setIsBackVisible] = useState(true);
-  //const userID = role === 'guest' ? 9999999 : parseInt(localStorage.getItem('user_id'), 10);
   
   const location = useLocation();
-  const { id: reportID } = useParams(); // Get reportID from URL
 
   useEffect(() => {
-    const getSpecificReportData = async () => {
+    const getSpecificStrayReportData = async () => {
       try {
-        if (reportID) { // Fetch only if reportID exists
-          const response = await axios.post(
-            "http://localhost:8000/api/getSpecificStrayReport",
-            {
-              reportID: reportID,
-            }
-          );
+        const reportID = location.state?.reportID; 
+        if (reportID) {
+          const response = await axios.post('http://localhost:8000/api/getSpecificStrayReport', {
+            reportID: reportID,
+          });
+          console.log("hi",response.data.data); 
           setCaseInfo(response.data.data);
           setLoading(false);
         }
       } catch (error) {
-        console.error("Error fetching specific report data:", error);
-        setLoading(false);
+        console.error('Error fetching specific report data:', error);
       }
     };
-  
-    getSpecificReportData();
-  }, [reportID]); // Dependency array updated to trigger on reportID change
-  
+
+    getSpecificStrayReportData();
+  }, [location.state]);
 
   const handleBack = () => {
     navigate(-1); // Navigate back to the previous page
