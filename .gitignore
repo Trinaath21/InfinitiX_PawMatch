@@ -1,0 +1,57 @@
+# ─────────────────────────────
+# LARAVEL BACKEND (pawmatchbackend)
+# ─────────────────────────────
+pawmatchbackend/.phpunit.cache
+pawmatchbackend/node_modules
+pawmatchbackend/public/build
+pawmatchbackend/public/hot
+pawmatchbackend/public/storage
+pawmatchbackend/storage/*.key
+pawmatchbackend/storage/pail
+pawmatchbackend/vendor
+pawmatchbackend/.env
+pawmatchbackend/.env.backup
+pawmatchbackend/.env.production
+pawmatchbackend/.phpactor.json
+pawmatchbackend/.phpunit.result.cache
+pawmatchbackend/Homestead.json
+pawmatchbackend/Homestead.yaml
+pawmatchbackend/auth.json
+pawmatchbackend/npm-debug.log
+pawmatchbackend/yarn-error.log
+
+# ─────────────────────────────
+# REACT FRONTEND (pawmatchfrontend)
+# ─────────────────────────────
+pawmatchfrontend/node_modules
+pawmatchfrontend/build
+pawmatchfrontend/dist
+pawmatchfrontend/.env
+pawmatchfrontend/.env.local
+pawmatchfrontend/.env.development.local
+pawmatchfrontend/.env.test.local
+pawmatchfrontend/.env.production.local
+pawmatchfrontend/npm-debug.log
+pawmatchfrontend/yarn-error.log
+pawmatchfrontend/yarn-debug.log
+
+# ─────────────────────────────
+# EDITORS & IDEs (root level)
+# ─────────────────────────────
+.fleet
+.idea
+.vscode
+.zed
+
+# ─────────────────────────────
+# DOCKER & CI
+# ─────────────────────────────
+.env
+*.env
+
+# ─────────────────────────────
+# OS FILES
+# ─────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
